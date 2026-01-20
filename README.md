@@ -1,4 +1,4 @@
-# test
+# Mister IA
 
 To install dependencies:
 
@@ -6,10 +6,17 @@ To install dependencies:
 bun install
 ```
 
-To run:
+To run in development mode:
 
 ```bash
-bun run index.ts
+bun run dev # watches changes and builds to dist
+bun run serve # serves the dist directory
 ```
 
-This project was created using `bun init` in bun v1.3.1. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Then in your browser, go to the preprod url to see the output. In the console, type
+```bash
+localStorage.setItem("devMode", "true");
+```
+and refresh the page to use the code in your localhost.
+
+In production, you have to tag the commit with the version number, and then update the `SCRIPT_TAG` in the Webflow site settings > custom code > head > script tag.
