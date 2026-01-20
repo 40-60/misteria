@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf dist && bunx tsc --outDir dist --rootDir src src/**/*.ts",
+    "serve": "bunx serve dist"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
