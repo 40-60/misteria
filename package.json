@@ -4,8 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "dev": "bunx tsc --outDir dist --rootDir src --watch src/**/*.ts src/*.ts",
     "build": "rm -rf dist && bunx tsc --outDir dist --rootDir src src/**/*.ts src/*.ts",
-    "serve": "bunx serve dist"
+    "serve": "bunx serve ."
   },
   "devDependencies": {
     "@types/bun": "latest"
