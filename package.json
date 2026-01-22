@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run build && bunx tsc --outDir dist --rootDir src --allowJs --watch src/**/*.ts src/*.ts src/**/*.js",
-    "build": "rm -rf dist && bunx tsc --outDir dist --rootDir src src/**/*.ts src/*.ts",
-    "serve": "bunx serve ."
+    "dev": "bun run build && bunx tsc --outDir dist --rootDir src --allowJs --module ESNext --target ESNext --moduleResolution Bundler --skipLibCheck --watch src/**/*.ts src/*.ts src/**/*.js",
+    "build": "rm -rf dist && bunx tsc --outDir dist --rootDir src --allowJs --module ESNext --target ESNext --moduleResolution Bundler --skipLibCheck src/**/*.ts src/*.ts src/**/*.js",
+    "serve": "bunx serve . --cors -l 3000"
   },
   "devDependencies": {
     "@types/bun": "latest"
