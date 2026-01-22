@@ -1,10 +1,7 @@
 // expertise conseil section
 if (document.querySelector('.section-expertise-conseil') && window.innerWidth >= 991) {
-    document.addEventListener("DOMContentLoaded", function () {
-
-
-
-
+    (async function() {
+        try {
             /* =========================
         1. Injection du CSS
         ========================= */
@@ -127,5 +124,8 @@ if (document.querySelector('.section-expertise-conseil') && window.innerWidth >=
                 images.forEach(img => img.classList.remove("is-active"));
                 images[fallbackIndex].classList.add("is-active");
             });
-    });
+    }catch (err) {
+            console.error('Erreur lors du chargement de la section', err);
+        }
+    })();
 }
