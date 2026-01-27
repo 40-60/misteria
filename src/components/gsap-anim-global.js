@@ -1,0 +1,177 @@
+// Charger GSAP depuis un CDN
+const gsapScript = document.createElement("script");
+gsapScript.src = "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js";
+document.head.appendChild(gsapScript);
+
+// Charger SplitText depuis le CDN (version démo)
+const splitScript = document.createElement("script");
+splitScript.src = "https://assets.codepen.io/16327/SplitText3-beta.min.js?b=26";
+document.head.appendChild(splitScript);
+
+// Charger ScrollTrigger
+const scrollTriggerScript = document.createElement("script");
+scrollTriggerScript.src = "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js";
+document.head.appendChild(scrollTriggerScript);
+
+// Attendre que tous les scripts soient chargés
+splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
+    gsap.registerPlugin(SplitText, ScrollTrigger);
+    console.clear();
+    
+    // title animation
+    document.fonts.ready.then(() => {
+        // Sélectionner tous les h1 à h6 qui ne sont pas descendants de .w-dyn-items
+        const headers = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+        .filter(el => !el.closest(".w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
+        
+        headers.forEach((header) => {
+            gsap.set(header, { opacity: 1 });
+            
+            // SplitText
+            const split = SplitText.create(header, {
+                type: "words,lines",
+                linesClass: "line",
+                autoSplit: true,
+                mask: "lines"
+            });
+            
+            // Animation au scroll
+            gsap.from(split.lines, {
+                yPercent: 100,
+                opacity: 0,
+                stagger: 0.1,
+                duration: 0.85,
+                ease: "cubic-bezier(0.4, 0, 0, 1)",
+                scrollTrigger: {
+                    trigger: header,
+                    start: "top 85%",  // quand le haut du header est à 80% de la fenêtre
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+    });
+    
+    // paragraphe animation
+    document.fonts.ready.then(() => {
+        const elements = Array.from(document.querySelectorAll(".normal-reg, .medium-reg, .medium-b"))
+        .filter(el => !el.closest(".formation-info-wrapper-global .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
+        
+        elements.forEach(el => {
+            gsap.set(el, { opacity: 0, y: 30 }); // position de départ
+            
+            gsap.to(el, {
+                opacity: 1,
+                y: 0,
+                duration: 0.85,
+                stagger: 0.1,
+                ease: "cubic-bezier(0.4, 0, 0, 1)",
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%", // déclenchement quand le haut de l'élément est à 80% de la fenêtre
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+    });
+    
+    // image animation
+    document.fonts.ready.then(() => {
+        const images = Array.from(document.querySelectorAll("img"))
+        .filter(img => !img.closest(
+            ".section-espace-presse, .formation-info-1, .financement-wrapper, .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .footer, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container, .section-expertise-conseil"
+        ));
+        
+        images.forEach(img => {
+            // Wrapper
+            const wrapper = document.createElement("div");
+            wrapper.style.position = "relative";
+            wrapper.style.overflow = "hidden";
+            wrapper.style.display = "inline-block";
+            wrapper.style.width = "100%";
+            
+            // Masque blanc (rideau inversé)
+            const mask = document.createElement("div");
+            mask.style.position = "absolute";
+            mask.style.top = 0;
+            mask.style.left = 0;
+            mask.style.width = "100%";
+            mask.style.height = "100%";
+            mask.style.background = "#fff";
+            mask.style.zIndex = 2;
+            
+            // DOM
+            img.parentNode.insertBefore(wrapper, img);
+            wrapper.appendChild(img);
+            wrapper.appendChild(mask);
+            
+            // État initial image (zoom)
+            gsap.set(img, { scale: 1.5 });
+            
+            // Timeline
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: wrapper,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                }
+            });
+            
+            // Rideau
+            tl.to(mask, {
+                height: 0,
+                duration: 0.85,
+                ease: "cubic-bezier(0.4, 0, 0, 1)"
+            }, 0);
+            
+            // Dézoom image
+            tl.to(img, {
+                scale: 1,
+                duration: 0.85,
+                ease: "cubic-bezier(0.4, 0, 0, 1)"
+            }, 0);
+        });
+    });
+    
+    // animation de bloc pas au point
+    document.fonts.ready.then(() => {
+        const containers = document.querySelectorAll(".w-dyn-items");
+        
+        containers.forEach(container => {
+            const items = container.querySelectorAll(".w-dyn-item");
+            
+            if (!items.length) return;
+            
+            // État initial : tous à 0.2
+            gsap.set(items, { opacity: 0.2 });
+            
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: container,
+                    start: "top 75%",
+                    end: () => "+=" + container.offsetHeight,
+                    scrub: 3,          // 👈 LE POINT CLÉ
+                    invalidateOnRefresh: true,
+                    once: true           // 👈 joue l’animation une seule fois
+                }
+            });
+            
+            items.forEach((item, index) => {
+                // Étape principale : item courant à 1
+                tl.to(item, {
+                    opacity: 1,
+                    ease: "none"
+                });
+                
+                // Étape suivante : préparer le prochain à 0.5
+                if (items[index + 1]) {
+                    tl.to(items[index + 1], {
+                        opacity: 0.85,
+                        ease: "none"
+                    }, "<");
+                }
+            });
+        });
+    });
+    
+};
+

@@ -7,71 +7,71 @@ if (document.querySelector('.section-expertise-conseil') && window.innerWidth >=
         ========================= */
             const style = document.createElement("style");
             style.innerHTML = `
-            .expertise-left {
-            position: relative;
-            overflow: hidden;
-            }
+                    .expertise-left {
+                    position: relative;
+                    overflow: hidden;
+                    }
 
-            /* Infos & images superposées et centrées */
-            .expertise-title-info {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
-            }
+                    /* Infos & images superposées et centrées */
+                    .expertise-title-info {
+                    position: absolute;
+                    top: 50%;
+                    width: 100%;
+                    transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
+                    }
 
-            .expertise-image-wrapper {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            transform: translateY(-50%);
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
-            }
+                    .expertise-image-wrapper {
+                    position: absolute;
+                    top: 50%;
+                    left: 0;
+                    width: 100%;
+                    transform: translateY(-50%);
+                    transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
+                    }
 
-            /* État par défaut */
-            .expertise-title-info {
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 2;
-            }
+                    /* État par défaut */
+                    .expertise-title-info {
+                    opacity: 1;
+                    pointer-events: auto;
+                    z-index: 2;
+                    }
 
-            .expertise-image-wrapper {
-            opacity: 0;
-            pointer-events: none;
-            z-index: 1;
-            }
+                    .expertise-image-wrapper {
+                    opacity: 0;
+                    pointer-events: none;
+                    z-index: 1;
+                    }
 
-            /* États actifs */
-            .expertise-title-info.is-hidden {
-            opacity: 0;
-            pointer-events: none;
-            }
+                    /* États actifs */
+                    .expertise-title-info.is-hidden {
+                    opacity: 0;
+                    pointer-events: none;
+                    }
 
-            .expertise-image-wrapper.is-visible {
-            opacity: 1;
-            pointer-events: auto;
-            }
+                    .expertise-image-wrapper.is-visible {
+                    opacity: 1;
+                    pointer-events: auto;
+                    }
 
-            /* Images */
-            .expertise-image-item {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 0.45s cubic-bezier(0.4, 0, 0, 1);
-            }
+                    /* Images */
+                    .expertise-image-item {
+                    position: absolute;
+                    inset: 0;
+                    opacity: 0;
+                    transition: opacity 0.45s cubic-bezier(0.4, 0, 0, 1);
+                    }
 
-            .expertise-image-item.is-active {
-            opacity: 1;
-            position: relative;
-            }
+                    .expertise-image-item.is-active {
+                    opacity: 1;
+                    position: relative;
+                    }
 
-            .expertise-image-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            }
-        `;
+                    .expertise-image-item img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    }
+                `;
             document.head.appendChild(style);
             /* =========================
             2. Sélecteurs
