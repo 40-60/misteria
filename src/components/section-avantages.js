@@ -97,6 +97,7 @@ if (document.querySelector('.section-avantage')
                         });
                     },
                     onEnterBack: () => {
+
                         images.forEach(img => img.classList.remove('active'));
                         if (images[i]) images[i].classList.add('active');
                         
@@ -109,11 +110,13 @@ if (document.querySelector('.section-avantage')
                         if (i !== items.length - 1) {
                             if (images[i]) images[i].classList.remove('active');
                         }
+                        titleInfo.classList.remove('active');
                     },
                     onLeaveBack: () => {
                         if (i !== 0) {
                             if (images[i]) images[i].classList.remove('active');
                         }
+                        titleInfo.classList.remove('active');
                     }
                 });
             });

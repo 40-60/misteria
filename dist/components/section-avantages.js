@@ -99,12 +99,14 @@ if (document.querySelector('.section-avantage')
                             if (images[i])
                                 images[i].classList.remove('active');
                         }
+                        titleInfo.classList.remove('active');
                     },
                     onLeaveBack: () => {
                         if (i !== 0) {
                             if (images[i])
                                 images[i].classList.remove('active');
                         }
+                        titleInfo.classList.remove('active');
                     }
                 });
             });
