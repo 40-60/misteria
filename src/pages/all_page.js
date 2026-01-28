@@ -4,3 +4,4 @@ import '../components/section-programme-contenu.js';
 import '../components/section-methodologie.js';
 import '../components/section-histoire.js';
 import '../components/section-testimonial.js';
+import '../components/section-team-slide.js';

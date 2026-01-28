@@ -1,74 +1,73 @@
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
 import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigger.js";
-if (document.querySelector('.section-methode-3') &&
-    window.innerWidth >= 991) {
+if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
     /* =========================
     1. Injection CSS
     ========================= */
     const style = document.createElement("style");
     style.innerHTML = `
-            .methodologies-audit-wrapper {
-                    display: flex;
-                    gap: 7rem;
-                    align-items: flex-start;
-                }
+    .methodologies-audit-wrapper {
+            display: flex;
+            gap: 7rem;
+            align-items: flex-start;
+        }
 
-                .methodologies-audit-wrapper-left {
-                    position: sticky;
-                    top: 10rem;
-                        flex: 25%;
-                    min-height: 580px;
-                }
+        .methodologies-audit-wrapper-left {
+            position: sticky;
+            top: 10rem;
+                flex: 25%;
+            min-height: 580px;
+        }
 
-                .methodologie-item-image {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                }
+        .methodologie-item-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-                .methodologie-item-image.active {
-                    opacity: 1 !important;
-                    z-index: 2;
-                }
+        .methodologie-item-image.active {
+            opacity: 1 !important;
+            z-index: 2;
+        }
 
-                .methodologies-audit-wrapper-right {
-                    flex: 75%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 3rem;
-                }
+        .methodologies-audit-wrapper-right {
+            flex: 75%;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
 
-                .methodologie-item {
-                    transition: opacity 0.3s ease;
-                }
+        .methodologie-item {
+            transition: opacity 0.3s ease;
+        }
 
-                .methodologie-item p.medium-reg {
-                    opacity: 0;
-                    visibility: hidden;
-                    height: 0;
-                    transition: height 0.3 ease;
-                }
+        .methodologie-item p.medium-reg {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            transition: height 0.3 ease;
+        }
 
-                .methodologie-item .margin-bottom.margin-40 {
-                    margin-bottom: 0;
-                }
-
-
-                .methodologie-item.active p.medium-reg {
-                    opacity: 1;
-                    visibility: visible;
-                    height: auto;
-                }
-
-                .methodologie-item .margin-bottom.margin-40 {
-                    margin-bottom: 0px;
-                }
+        .methodologie-item .margin-bottom.margin-40 {
+            margin-bottom: 0;
+        }
 
 
-            `;
+        .methodologie-item.active p.medium-reg {
+            opacity: 1;
+            visibility: visible;
+            height: auto;
+        }
+
+        .methodologie-item .margin-bottom.margin-40 {
+            margin-bottom: 0px;
+        }
+
+
+    `;
     document.head.appendChild(style);
     /* =========================
     2. GSAP Logic
