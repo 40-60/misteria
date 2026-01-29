@@ -5,3 +5,4 @@ import '../components/section-methodologie.js';
 import '../components/section-histoire.js';
 import '../components/section-testimonial.js';
 import '../components/section-team-slide.js';
+import '../components/section-solution-cas-client.js';
