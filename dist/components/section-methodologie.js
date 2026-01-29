@@ -97,7 +97,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
         pin: true,
         pinSpacing: false,
         pinType: "fixed",
-        markers: true,
+        markers: false,
         invalidateOnRefresh: true,
     });
     // Pin du wrapper-left (images)
@@ -111,7 +111,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
         pin: true,
         pinSpacing: false,
         pinType: "fixed",
-        markers: true,
+        markers: false,
         invalidateOnRefresh: false,
     });
     // Activation des items au scroll
@@ -122,7 +122,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
             end: "bottom center",
             onEnter: () => activateItem(index),
             onEnterBack: () => activateItem(index),
-            markers: true,
+            markers: false,
             pinSpacing: true,
         });
     });
