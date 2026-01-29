@@ -24,7 +24,7 @@ if (document.querySelector('.section-avantage')
         .avantages-anim-wrapper {
             display: grid;
             position: relative;
-            height: 1650px;
+            height: 1550px;
         }
 
         /* COLONNE GAUCHE - qui sera pinnée */
@@ -95,7 +95,7 @@ if (document.querySelector('.section-avantage')
             ScrollTrigger.create({
                 trigger: animWrapper,
                 start: 'top top+=110px', // commence à épingler quand le haut arrive à 100px du haut
-                end: () => `bottom ${window.innerHeight * 0.60}px`,
+                end: () => `bottom ${window.innerHeight * 1}px`,
                 pin: '.avantages-anim-wrapper > div:first-child', // pin la colonne gauche
                 pinSpacing: false,
                 anticipatePin: 1,
