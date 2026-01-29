@@ -5,108 +5,123 @@ if (document.querySelector('.section-avantage')
     && window.innerWidth >= 991) {
     const style = document.createElement("style");
     style.innerHTML = `
-            .title-info-avantage {
-                z-index: 0;
-            }
-            .avantages-anim-wrapper {
-                display: flex;
-                gap: 2rem;
-                position: relative;
-                align-items: flex-start; /* aligne le contenu et l'image en haut */
-            }
+        body > div.page-wrapper > main > section.section-avantage > div > div > div > div.pin-spacer > div {
+            min-height: 63rem;
+            position: relative;
+        }
 
-            .images-avantages-wrapper {
-                position: sticky;
-                top: 15rem; /* ajuste selon ton header */
-                flex: 1;
-                min-height: 580px; /* hauteur minimale */
-            }
+        body > div.page-wrapper > main > section.section-avantage > div > div > div > div.pin-spacer > div::after {
+            content: "";
+            position: absolute;
+            bottom: -14%;
+            background: linear-gradient(180deg, rgba(241, 245, 250, 0.00) 0%, #F1F5FA 50%);
+            width: 100vw;
+            height: 30rem;
+            transform: translateX(100rem);
+            right: 0;
+            z-index: 2;
+        }
+        .avantages-anim-wrapper {
+            display: grid;
+            position: relative;
+            height: 1650px;
+        }
 
-            .image-avantage-item {
-                opacity: 0;
-                position: absolute; /* nécessaire pour superposer les images */
-                top: 0; /* aligné en haut de la zone sticky */
-                left: 0;
-                width: 100%;
-                transition: opacity 0.3s ease;
-            }
+        /* COLONNE GAUCHE - qui sera pinnée */
+        .avantages-anim-wrapper > div:first-child {
+            flex: 0 0 45%; /* ajuste selon tes besoins */
+            position: relative;
+        }
 
-            .image-avantage-item.active {
-                opacity: 1;
-                z-index: 2;
-            }
+        .title-info-avantage {
+            margin-bottom: 2rem;
+        }
 
-            .avantages-wrapper {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                gap: 2rem; /* espace entre les items */
-            }
+        .images-avantages-wrapper {
+            position: relative;
+            min-height: 580px;
+        }
 
-        `;
+        .image-avantage-item {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-avantage-item.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* COLONNE DROITE - qui scroll */
+        .avantages-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: relative;
+            top: 8rem;
+        }
+
+        .avantage-wrapper {
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+        }
+
+        .avantage-wrapper.active {
+            opacity: 1;
+        }
+    `;
     document.head.appendChild(style);
-    // Charger GSAP et ScrollTrigger, puis lancer le code
+    // Charger GSAP et ScrollTrigger
     (async function () {
         try {
-            // Enregistrer ScrollTrigger
             gsap.registerPlugin(ScrollTrigger);
-            // Sélection des éléments
+            const animWrapper = document.querySelector('.avantages-anim-wrapper');
             const items = document.querySelectorAll('.avantages-wrapper .avantage-wrapper');
             const images = document.querySelectorAll('.images-avantages-wrapper .image-avantage-item');
-            const titleInfo = document.querySelector('.title-info-avantage');
-            if (!items)
+            const avantagesWrapper = document.querySelector('.avantages-wrapper');
+            if (!items.length || !animWrapper)
                 return;
-            // Rendre le titre sticky via CSS
-            titleInfo.style.position = 'sticky';
-            titleInfo.style.top = '7rem';
-            // titleInfo.style.zIndex = '10';
             // Afficher la première image par défaut
             if (images[0])
                 images[0].classList.add('active');
+            if (items[0])
+                items[0].classList.add('active');
+            // PINNING de toute la section .avantages-anim-wrapper
+            ScrollTrigger.create({
+                trigger: animWrapper,
+                start: 'top top+=110px', // commence à épingler quand le haut arrive à 100px du haut
+                end: () => `bottom ${window.innerHeight * 0.60}px`,
+                pin: '.avantages-anim-wrapper > div:first-child', // pin la colonne gauche
+                pinSpacing: false,
+                anticipatePin: 1,
+                markers: false // mettre à true pour débugger
+            });
             // Animation synchronisée images/contenus
             items.forEach((item, i) => {
-                // Mettre l'opacité initiale des items
-                items.forEach((el, idx) => {
-                    el.style.opacity = idx === 0 ? '1' : '0.4';
-                    el.style.transition = 'opacity 0.3s ease';
-                });
                 ScrollTrigger.create({
                     trigger: item,
-                    start: 'top center',
-                    end: 'bottom center',
+                    start: () => `top ${window.innerHeight * 0.5}px`,
+                    end: () => `bottom ${window.innerHeight * 0.6}px`,
                     onEnter: () => {
-                        titleInfo.classList.add('active');
                         // Active image
                         images.forEach(img => img.classList.remove('active'));
                         if (images[i])
                             images[i].classList.add('active');
-                        // Active item et opacity
-                        items.forEach((el, idx) => {
-                            el.style.opacity = idx === i ? '1' : '0.4';
-                        });
+                        // Active item
+                        items.forEach(el => el.classList.remove('active'));
+                        item.classList.add('active');
                     },
                     onEnterBack: () => {
                         images.forEach(img => img.classList.remove('active'));
                         if (images[i])
                             images[i].classList.add('active');
-                        // Opacité pour scroll vers le haut
-                        items.forEach((el, idx) => {
-                            el.style.opacity = idx === i ? '1' : '0.4';
-                        });
-                    },
-                    onLeave: () => {
-                        if (i !== items.length - 1) {
-                            if (images[i])
-                                images[i].classList.remove('active');
-                        }
-                        titleInfo.classList.remove('active');
-                    },
-                    onLeaveBack: () => {
-                        if (i !== 0) {
-                            if (images[i])
-                                images[i].classList.remove('active');
-                        }
-                        titleInfo.classList.remove('active');
+                        items.forEach(el => el.classList.remove('active'));
+                        item.classList.add('active');
                     }
                 });
             });
