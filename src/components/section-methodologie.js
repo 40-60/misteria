@@ -4,6 +4,13 @@ import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigge
 if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
     const style = document.createElement("style");
     style.innerHTML = `
+    .methodologies-audit-wrapper-left img {
+        height: 400px !important;
+    }
+
+    .methodologies-audit-wrapper-left {
+        height: 400px !important;
+    }
     .methodologie-item p.medium-reg {
         opacity: 0 !important;
         transform: translateY(10px) !important;
@@ -62,79 +69,107 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
 
     const items = document.querySelectorAll(".methodologie-item");
     const images = document.querySelectorAll(".methodologies-audit-wrapper-left .methodologie-item-image");
-    const compteur = document.querySelector(".compteur-methodologie .other-data-sm:first-child");
+    const compteurGauche = document.querySelector(".compteur-methodologie .other-data-sm:first-child");
+    const compteurDroit = document.querySelector(".compteur-methodologie .other-data-sm:last-child");
+
+    // Mettre à jour le total sur le côté droit
+    if (compteurDroit) {
+        const totalItems = items.length.toString().padStart(2, '0');
+        compteurDroit.textContent = totalItems;
+    }
 
     // Remplacer l'image par une barre de progression
     const imgElement = document.querySelector(".compteur-methodologie img");
     if (imgElement) {
-    const progressBarHTML = `
-        <div class="progress-bar-container">
-        <div class="progress-bar-fill"></div>
-        </div>
-    `;
-    imgElement.outerHTML = progressBarHTML;
+        const progressBarHTML = `
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill"></div>
+            </div>
+        `;
+        imgElement.outerHTML = progressBarHTML;
     }
 
     const progressBar = document.querySelector(".progress-bar-fill");
 
     function activateItem(index) {
-    items.forEach((i, idx) => i.classList.toggle("active", idx === index));
-    images.forEach((img, idx) => img.classList.toggle("active", idx === index));
-    
-    // Mise à jour du compteur
-    if (compteur) {
-        const currentNumber = (index + 1).toString().padStart(2, '0');
-        compteur.textContent = currentNumber;
-    }
-    
-    // Mise à jour de la barre de progression
-    if (progressBar) {
-        const totalItems = items.length;
-        const progressPercentage = ((index + 1) / totalItems) * 100;
-        progressBar.style.width = `${progressPercentage}%`;
-    }
+        items.forEach((i, idx) => i.classList.toggle("active", idx === index));
+        images.forEach((img, idx) => img.classList.toggle("active", idx === index));
+        
+        // Mise à jour du compteur gauche (current)
+        if (compteurGauche) {
+            const currentNumber = (index + 1).toString().padStart(2, '0');
+            compteurGauche.textContent = currentNumber;
+        }
+        
+        // Mise à jour de la barre de progression
+        if (progressBar) {
+            const totalItems = items.length;
+            const progressPercentage = ((index + 1) / totalItems) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
     }
 
     // Pin du titre
     ScrollTrigger.create({
-    trigger: ".section-methode-info-title",
-    start: "top top+=130rem",
-    end: () => {
-        const rightWrapper = document.querySelector(".methodologies-audit-wrapper-right");
-        return `+=${rightWrapper.offsetHeight - 100}`;
-    },
-    pin: true,
-    pinSpacing: false,
-    pinType: "fixed",
-    markers: false,
-    invalidateOnRefresh: true,
+        trigger: ".section-methode-info-title",
+        start: "top top+=120rem",
+        end: () => {
+            const rightWrapper = document.querySelector(".methodologies-audit-wrapper-right");
+            const leftWrapper = document.querySelector(".methodologies-audit-wrapper-left");
+            const infoTitle = document.querySelector(".methode-title-info");
+            const description = document.querySelector(
+                'body > div.page-wrapper > main > section.section-methode-3 > div > div > div.margin-bottom.margin-80'
+            );
+
+            const descriptionHeight = description ? description.offsetHeight : 0;
+
+            console.log('descriptionHeight', descriptionHeight);
+
+            return `+=${rightWrapper.offsetHeight - (leftWrapper.offsetHeight)}`;
+        },
+
+        pin: true,
+        pinSpacing: false,
+        pinType: "fixed",
+        markers: false,
+        invalidateOnRefresh: true,
     });
 
     // Pin du wrapper-left (images)
     ScrollTrigger.create({
-    trigger: ".methodologies-audit-wrapper-left",
-    start: "top top+=340rem",
-    end: () => {
-        const rightWrapper = document.querySelector(".methodologies-audit-wrapper-right");
-        return `+=${rightWrapper.offsetHeight - 300}`;
-    },
-    pin: true,
-    pinSpacing: false,
-    pinType: "fixed",
-    markers: false,
-    invalidateOnRefresh: false,
+        trigger: ".methodologies-audit-wrapper-left",
+        start: "top top+=400rem",
+
+        end: () => {
+            const rightWrapper = document.querySelector(".methodologies-audit-wrapper-right");
+            const leftWrapper = document.querySelector(".methodologies-audit-wrapper-left");
+            const description = document.querySelector(
+                'body > div.page-wrapper > main > section.section-methode-3 > div > div > div.margin-bottom.margin-80'
+            );
+
+            const descriptionHeight = description ? description.offsetHeight : 0;
+
+            // console.log('descriptionHeight', descriptionHeight);
+
+            return `+=${rightWrapper.offsetHeight - leftWrapper.offsetHeight - descriptionHeight + 20}`;
+        },
+        pin: true,
+        pinSpacing: false,
+        pinType: "fixed",
+        markers: false,
+        invalidateOnRefresh: false,
     });
 
     // Activation des items au scroll
     items.forEach((item, index) => {
-    ScrollTrigger.create({
-        trigger: item,
-        start: "top center",
-        end: "bottom center",
-        onEnter: () => activateItem(index),
-        onEnterBack: () => activateItem(index),
-        markers: false,
-        pinSpacing: true,
-    });
+        ScrollTrigger.create({
+            trigger: item,
+            start: "top center",
+            end: "bottom center",
+            onEnter: () => activateItem(index),
+            onEnterBack: () => activateItem(index),
+            markers: false,
+            pinSpacing: true,
+        });
     });
 }
