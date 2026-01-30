@@ -84,6 +84,7 @@ if (document.querySelector('.section-avantage')
             const items = section.querySelectorAll('.avantages-wrapper .avantage-wrapper');
             const images = section.querySelectorAll('.images-avantages-wrapper .image-avantage-item');
             const avantagesWrapper = section.querySelector('.avantages-wrapper');
+            const steps = items.length;
 
             if (!items.length || !animWrapper || !leftCol) return;
 
@@ -180,22 +181,25 @@ if (document.querySelector('.section-avantage')
                 id: 'avantage-pin' // ID unique pour ce trigger
             });
 
-            // Animation synchronisée images/contenus
-            items.forEach((item, i) => {
-                ScrollTrigger.create({
-                    trigger: item,
-                    start: 'top 60%',
-                    end: 'bottom 40%',
-                    onEnter: () => activateItem(i),
-                    onEnterBack: () => activateItem(i),
-                    onLeaveBack: () => {
-                        if (i > 0) {
-                            activateItem(i - 1);
-                        }
-                    },
-                    markers: false,
-                    id: `avantage-item-${i}` // ID unique pour chaque trigger
-                });
+            // Animation synchronisée images/contenus avec scrub
+            ScrollTrigger.create({
+                trigger: avantagesWrapper,
+                start: 'top 30%',
+                end: 'bottom center',
+                scrub: 1,
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    const segment = 1 / steps;
+                    let activeIdx = Math.floor(progress / segment);
+
+                    // Clamp l'index
+                    if (activeIdx < 0) activeIdx = 0;
+                    if (activeIdx >= steps) activeIdx = steps - 1;
+
+                    activateItem(activeIdx);
+                },
+                markers: false,
+                id: 'avantage-scroll'
             });
 
             // Gestion du resize

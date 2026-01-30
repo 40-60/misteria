@@ -10,6 +10,9 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
 
     .methodologies-audit-wrapper-left {
         height: 400px !important;
+        width: 328px !important;
+
+        overflow: hidden !important;
     }
     .methodologie-item p.medium-reg {
         opacity: 0 !important;
@@ -30,21 +33,24 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
 
     .methodologie-item-image {
         position: absolute;
-        top: 0;
-        width: max-content;
-        height: max-content;
-        opacity: 0;
+        top: 2rem;
+        width: 100%;
+        height: 100%;
         left: 0;
-        transition: opacity 850ms cubic-bezier(0.4, 0, 0, 1), transform 850ms cubic-bezier(0.4, 0, 0, 1);
+        pointer-events: none;
+        z-index: 1;
     }
 
     .methodologie-item-image img {
         height: 100%;
         width: 100%;
+        object-fit: cover;
     }
 
     .methodologie-item-image.active {
         opacity: 1;
+        pointer-events: auto;
+        z-index: 2;
     }
 
     /* Styles pour la barre de progression */
@@ -72,6 +78,14 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
     const compteurGauche = document.querySelector(".compteur-methodologie .other-data-sm:first-child");
     const compteurDroit = document.querySelector(".compteur-methodologie .other-data-sm:last-child");
 
+    // Variable pour tracker l'index actif
+    let currentIndex = -1;
+
+    // Initialiser toutes les images en position basse
+    images.forEach(img => {
+        gsap.set(img, { y: '100%', opacity: 0 });
+    });
+
     // Mettre à jour le total sur le côté droit
     if (compteurDroit) {
         const totalItems = items.length.toString().padStart(2, '0');
@@ -91,16 +105,69 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
 
     const progressBar = document.querySelector(".progress-bar-fill");
 
+    // Activer le premier élément par défaut
+    if (images.length > 0 && items.length > 0) {
+        gsap.set(images[0], { y: '0%', opacity: 1 });
+        images[0].classList.add("active");
+        items[0].classList.add("active");
+        currentIndex = 0;
+
+        // Initialiser le compteur et la barre de progression
+        if (compteurGauche) {
+            compteurGauche.textContent = '01';
+        }
+        if (progressBar) {
+            const progressPercentage = (1 / items.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+    }
+
     function activateItem(index) {
+        if (currentIndex === index) return;
+
+        const previousIndex = currentIndex;
+        currentIndex = index;
+
+        // Activer/désactiver les items texte
         items.forEach((i, idx) => i.classList.toggle("active", idx === index));
-        images.forEach((img, idx) => img.classList.toggle("active", idx === index));
-        
+
+        // Animation des images avec effet de stack
+        if (images[index]) {
+            const goingDown = index > previousIndex;
+
+            // Animation de l'ancienne image (si elle existe)
+            if (previousIndex >= 0 && images[previousIndex]) {
+                images[previousIndex].classList.remove("active");
+                gsap.to(images[previousIndex], {
+                    y: goingDown ? '-100%' : '100%',
+                    opacity: 0,
+                    duration: 0.85,
+                    ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                });
+            }
+
+            // Animation de la nouvelle image
+            images[index].classList.add("active");
+            gsap.fromTo(images[index],
+                {
+                    y: goingDown ? '100%' : '-100%',
+                    opacity: 1
+                },
+                {
+                    y: '0%',
+                    opacity: 1,
+                    duration: 0.85,
+                    ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                }
+            );
+        }
+
         // Mise à jour du compteur gauche (current)
         if (compteurGauche) {
             const currentNumber = (index + 1).toString().padStart(2, '0');
             compteurGauche.textContent = currentNumber;
         }
-        
+
         // Mise à jour de la barre de progression
         if (progressBar) {
             const totalItems = items.length;
@@ -164,7 +231,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
     items.forEach((item, index) => {
         ScrollTrigger.create({
             trigger: item,
-            start: "top center",
+            start: "top 30%",
             end: "bottom center",
             onEnter: () => activateItem(index),
             onEnterBack: () => activateItem(index),

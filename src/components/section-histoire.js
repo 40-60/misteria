@@ -9,10 +9,10 @@ if (document.querySelector('.section-histoire') && window.innerWidth >= 991) {
         .histoire-card.active { opacity:1; transform:translateY(0); }
         .methodologie-item._2 { display:none; opacity:0; transform:translateY(12px); transition:opacity 0.85s, transform 0.85s; }
         .active .methodologie-item._2 { display:block; opacity:1; transform:translateY(0); }
-        .histoire-content-wrapper-left { position:relative; }
-        .image-histoire-content-item { position:absolute; top:0; left:0; width:100%; opacity:0; transition:opacity 0.85s, transform 0.85s; }
-        .image-histoire-content-item.active { opacity:1; transform:scale(1); }
-        .histoire-card, .image-histoire-content-item, .methodologie-item._2 { will-change: opacity, transform; }
+        .histoire-content-wrapper-left { position:relative; overflow: hidden; }
+        .image-histoire-content-item { position:absolute; top:0; left:0; width:100%; opacity:0; pointer-events: none; }
+        .image-histoire-content-item.active { opacity:1; pointer-events: auto; }
+        .histoire-card, .methodologie-item._2 { will-change: opacity, transform; }
     `;
     document.head.appendChild(style);
 
@@ -21,29 +21,83 @@ if (document.querySelector('.section-histoire') && window.innerWidth >= 991) {
     const section = document.querySelector('.section-histoire');
     const cards = gsap.utils.toArray(".histoire-card");
     const images = gsap.utils.toArray(".image-histoire-content-item");
+    const steps = cards.length;
 
-    // ScrollTrigger global
-    ScrollTrigger.create({
-        trigger: section,
-        start: "top 35%",
-        end: "bottom 35%",
-        onUpdate: self => {
-            const progress = self.progress; // 0 → 1
-            const index = Math.floor(progress * cards.length);
-            activateStep(index);
-        },
-        markers: false // pour debug
+    // Variable pour tracker l'index actif
+    let currentIndex = -1;
+
+    // Initialiser toutes les images en position basse
+    images.forEach(img => {
+        gsap.set(img, { y: '100%', opacity: 0 });
     });
 
     function activateStep(index) {
-        // clamp index pour éviter overflow
-        const safeIndex = Math.min(index, cards.length - 1);
+        if (currentIndex === index) return;
 
+        const previousIndex = currentIndex;
+        currentIndex = index;
+
+        // Activer/désactiver les cartes texte
         cards.forEach(card => card.classList.remove("active"));
-        images.forEach(img => img.classList.remove("active"));
+        cards[index].classList.add("active");
 
-        cards[safeIndex].classList.add("active");
-        images[safeIndex].classList.add("active");
+        // Animation des images avec effet de stack
+        if (images[index]) {
+            const goingDown = index > previousIndex;
+
+            // Animation de l'ancienne image (si elle existe)
+            if (previousIndex >= 0 && images[previousIndex]) {
+                images[previousIndex].classList.remove("active");
+                gsap.to(images[previousIndex], {
+                    y: goingDown ? '-100%' : '100%',
+                    opacity: 0,
+                    duration: 0.85,
+                    ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                });
+            }
+
+            // Animation de la nouvelle image
+            images[index].classList.add("active");
+            gsap.fromTo(images[index],
+                {
+                    y: goingDown ? '100%' : '-100%',
+                    opacity: 1
+                },
+                {
+                    y: '0%',
+                    opacity: 1,
+                    duration: 0.85,
+                    ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                }
+            );
+        }
     }
+
+    // Activer le premier élément par défaut
+    gsap.set(images[0], { y: '0%', opacity: 1 });
+    images[0].classList.add("active");
+    cards[0].classList.add("active");
+    currentIndex = 0;
+
+    // ScrollTrigger avec scrub pour animation fluide
+    ScrollTrigger.create({
+        trigger: section,
+        start: "top 20%",
+        end: "bottom center",
+        scrub: 1,
+        onUpdate: (self) => {
+            const progress = self.progress;
+            const segment = 1 / steps;
+            let activeIdx = Math.floor(progress / segment);
+
+            // Clamp l'index
+            if (activeIdx < 0) activeIdx = 0;
+            if (activeIdx >= steps) activeIdx = steps - 1;
+
+            activateStep(activeIdx);
+        },
+        markers: false,
+        id: 'histoire-scroll'
+    });
 
 }
