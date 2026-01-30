@@ -33,6 +33,7 @@ if (document.querySelector('.section-avantage')
         .section-avantage .images-avantages-wrapper {
             position: relative;
             min-height: 580px;
+            overflow: hidden;
         }
 
         .section-avantage .image-avantage-item {
@@ -41,7 +42,6 @@ if (document.querySelector('.section-avantage')
             top: 0;
             left: 0;
             width: 100%;
-            transition: opacity 0.4s ease;
             pointer-events: none;
         }
 
@@ -61,7 +61,7 @@ if (document.querySelector('.section-avantage')
 
         .section-avantage .avantage-wrapper {
             opacity: 0.35;
-            transition: opacity 0.4s ease;
+            transition: opacity 850ms cubic-bezier(0.4, 0, 0, 1);
         }
 
         .section-avantage .avantage-wrapper.avantage-active {
@@ -93,10 +93,10 @@ if (document.querySelector('.section-avantage')
             // Fonction pour calculer la hauteur nécessaire
             const setupLayout = () => {
                 animWrapper.style.minHeight = '';
-                
+
                 const leftColHeight = leftCol.offsetHeight;
                 const rightColHeight = avantagesWrapper.offsetHeight;
-                
+
                 const minHeight = Math.max(leftColHeight, rightColHeight);
                 animWrapper.style.minHeight = `${minHeight}px`;
             };
@@ -104,28 +104,63 @@ if (document.querySelector('.section-avantage')
             // Setup initial
             setupLayout();
 
+            // Initialiser toutes les images en position basse
+            images.forEach(img => {
+                gsap.set(img, { y: '100%', opacity: 0 });
+            });
+
             // Fonction pour activer un item et son image correspondante
             function activateItem(index) {
                 if (currentIndex === index) return;
+
+                const previousIndex = currentIndex;
                 currentIndex = index;
 
-                // Désactiver toutes les images (classe spécifique)
-                images.forEach(img => img.classList.remove('avantage-active'));
-                // Désactiver tous les items (classe spécifique)
+                // Désactiver tous les items texte (classe spécifique)
                 items.forEach(el => el.classList.remove('avantage-active'));
-                
-                // Activer l'image correspondante à l'index
-                if (images[index]) {
-                    images[index].classList.add('avantage-active');
-                }
-                // Activer l'item correspondant
+
+                // Activer l'item texte correspondant
                 if (items[index]) {
                     items[index].classList.add('avantage-active');
+                }
+
+                // Animation des images avec effet de stack
+                if (images[index]) {
+                    const goingDown = index > previousIndex;
+
+                    // Animation de l'ancienne image (si elle existe)
+                    if (previousIndex >= 0 && images[previousIndex]) {
+                        images[previousIndex].classList.remove('avantage-active');
+                        gsap.to(images[previousIndex], {
+                            y: goingDown ? '-100%' : '100%',
+                            opacity: 0.33,
+                            duration: 0.85,
+                            ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                        });
+                    }
+
+                    // Animation de la nouvelle image
+                    images[index].classList.add('avantage-active');
+                    gsap.fromTo(images[index],
+                        {
+                            y: goingDown ? '100%' : '-100%',
+                            opacity: 1
+                        },
+                        {
+                            y: '0%',
+                            opacity: 1,
+                            duration: 0.85,
+                            ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                        }
+                    );
                 }
             }
 
             // Activer le premier élément par défaut
-            activateItem(0);
+            gsap.set(images[0], { y: '0%', opacity: 1 });
+            images[0].classList.add('avantage-active');
+            items[0].classList.add('avantage-active');
+            currentIndex = 0;
 
             // PINNING de la colonne gauche
             ScrollTrigger.create({
