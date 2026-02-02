@@ -1,5 +1,4 @@
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
-import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigger.js";
 
 if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
 
@@ -55,7 +54,7 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             object-fit: cover;
         }
 
-        /* COLONNE DROITE - Scroll naturel */
+        /* COLONNE DROITE */
         .section-solution .content-solution-right {
             padding-top: 0;
             padding-bottom: 0;
@@ -75,11 +74,16 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             opacity: 0.4;
             padding: 1.5rem 0;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            transition: opacity 850ms cubic-bezier(0.4, 0, 0, 1);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
 
         .section-solution .content-solution-right .histoire-card .w-dyn-item:first-child {
             border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .section-solution .content-solution-right .histoire-card .w-dyn-item:hover {
+            opacity: 0.7;
         }
 
         .section-solution .content-solution-right .histoire-card .w-dyn-item.solution-active {
@@ -94,7 +98,7 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             display: none;
         }
 
-        /* Nouvelle méthode : grid pour une animation fluide */
+        /* Accordion avec grid pour animation fluide */
         .section-solution .content-solution-right .w-dyn-item .methodologie-item._2 {
             display: grid;
             grid-template-rows: 0fr;
@@ -149,19 +153,20 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
         document.head.appendChild(style);
     }
 
-    (async function() {
+    (function() {
         try {
-            gsap.registerPlugin(ScrollTrigger);
-
             const section = document.querySelector('.section-solution');
             const wrapper = section.querySelector('.methodologies-audit-wrapper');
-            const leftCol = section.querySelector('.content-solution-left');
-            const rightCol = section.querySelector('.content-solution-right');
 
             const leftItems = section.querySelectorAll('.content-solution-left .w-dyn-items .w-dyn-item');
             const rightItems = section.querySelectorAll('.content-solution-right .histoire-card .w-dyn-item');
 
-            // Initialiser toutes les images en position basse (comme section-avantages)
+            if (!leftItems.length || !rightItems.length || !wrapper) return;
+
+            let currentIndex = -1;
+            let isAnimating = false;
+
+            // Initialiser toutes les images en position cachée
             leftItems.forEach((item) => {
                 gsap.set(item, { y: '100%', opacity: 0 });
             });
@@ -179,24 +184,27 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
                 if (methodologieItem) {
                     const marginDiv = methodologieItem.querySelector('.margin-bottom.margin-40');
                     if (marginDiv && !marginDiv.querySelector('.content-inner')) {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'content-inner';
+                        const contentWrapper = document.createElement('div');
+                        contentWrapper.className = 'content-inner';
                         while (marginDiv.firstChild) {
-                            wrapper.appendChild(marginDiv.firstChild);
+                            contentWrapper.appendChild(marginDiv.firstChild);
                         }
-                        marginDiv.appendChild(wrapper);
+                        marginDiv.appendChild(contentWrapper);
                     }
                 }
             });
 
-            if (!leftItems.length || !rightItems.length || !wrapper) return;
-
-            let currentIndex = -1;
-
-            // Fonction pour activer un item avec effet de stack (comme section-avantages)
+            // Fonction pour activer un item au clic
             function activateItem(index) {
-                if (currentIndex === index) return;
+                if (isAnimating) return;
 
+                // Si on clique sur l'item déjà actif, on le ferme
+                if (currentIndex === index) {
+                    closeAll();
+                    return;
+                }
+
+                isAnimating = true;
                 const previousIndex = currentIndex;
                 currentIndex = index;
 
@@ -208,18 +216,18 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
                     rightItems[index].classList.add('solution-active');
                 }
 
-                // Animation des images avec effet de stack
+                // Animation des images
                 if (leftItems[index]) {
-                    const goingDown = index > previousIndex;
+                    const goingDown = previousIndex === -1 || index > previousIndex;
 
                     // Animation de l'ancienne image (si elle existe)
                     if (previousIndex >= 0 && leftItems[previousIndex]) {
                         leftItems[previousIndex].classList.remove('solution-active');
                         gsap.to(leftItems[previousIndex], {
                             y: goingDown ? '-100%' : '100%',
-                            opacity: 0.33,
-                            duration: 0.85,
-                            ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                            opacity: 0,
+                            duration: 0.6,
+                            ease: 'power3.inOut'
                         });
                     }
 
@@ -228,137 +236,63 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
                     gsap.fromTo(leftItems[index],
                         {
                             y: goingDown ? '100%' : '-100%',
-                            opacity: 1
+                            opacity: 0
                         },
                         {
                             y: '0%',
                             opacity: 1,
-                            duration: 0.85,
-                            ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                            duration: 0.6,
+                            ease: 'power3.inOut',
+                            onComplete: () => {
+                                isAnimating = false;
+                            }
                         }
                     );
+                } else {
+                    isAnimating = false;
                 }
             }
 
-            // Initialisation - première image visible en position 0
+            // Fonction pour tout fermer
+            function closeAll() {
+                if (isAnimating || currentIndex === -1) return;
+
+                isAnimating = true;
+                const previousIndex = currentIndex;
+                currentIndex = -1;
+
+                // Désactiver tous les items texte
+                rightItems.forEach(el => el.classList.remove('solution-active'));
+
+                // Fermer l'image active
+                if (previousIndex >= 0 && leftItems[previousIndex]) {
+                    leftItems[previousIndex].classList.remove('solution-active');
+                    gsap.to(leftItems[previousIndex], {
+                        y: '100%',
+                        opacity: 0,
+                        duration: 0.6,
+                        ease: 'power3.inOut',
+                        onComplete: () => {
+                            isAnimating = false;
+                        }
+                    });
+                } else {
+                    isAnimating = false;
+                }
+            }
+
+            // Ajouter les événements de clic sur chaque item
+            rightItems.forEach((item, i) => {
+                item.addEventListener('click', () => {
+                    activateItem(i);
+                });
+            });
+
+            // Ouvrir le premier item par défaut
             gsap.set(leftItems[0], { y: '0%', opacity: 1 });
             leftItems[0].classList.add('solution-active');
             rightItems[0].classList.add('solution-active');
             currentIndex = 0;
-
-            const totalItems = rightItems.length;
-            let isInSection = false;
-            let lastWheelTime = 0;
-            let exitDirection = null; // 'up' ou 'down' - direction de sortie
-            const wheelCooldown = 850; // Correspond à la durée de l'animation
-
-            // Fonction pour aller à l'item suivant
-            function goToNext() {
-                if (currentIndex < totalItems - 1) {
-                    activateItem(currentIndex + 1);
-                    return true;
-                }
-                return false;
-            }
-
-            // Fonction pour aller à l'item précédent
-            function goToPrev() {
-                if (currentIndex > 0) {
-                    activateItem(currentIndex - 1);
-                    return true;
-                }
-                return false;
-            }
-
-            // Gestionnaire de wheel pour le scroll step-by-step
-            function handleWheel(e) {
-                if (!isInSection) return;
-
-                const now = Date.now();
-                const direction = e.deltaY > 0 ? 'down' : 'up';
-
-                // Si on a quitté par un bord et qu'on revient dans l'autre sens, réactiver
-                if (exitDirection !== null) {
-                    if (exitDirection !== direction) {
-                        // On revient en arrière, réactiver le contrôle
-                        exitDirection = null;
-                    } else {
-                        // On continue dans la même direction, laisser le scroll naturel
-                        return;
-                    }
-                }
-
-                // Cooldown pour éviter les transitions trop rapides
-                if (now - lastWheelTime < wheelCooldown) {
-                    e.preventDefault();
-                    return;
-                }
-
-                if (direction === 'down') {
-                    if (currentIndex < totalItems - 1) {
-                        e.preventDefault();
-                        lastWheelTime = now;
-                        goToNext();
-                    } else {
-                        // Dernier item atteint, marquer la direction de sortie
-                        exitDirection = 'down';
-                    }
-                } else {
-                    if (currentIndex > 0) {
-                        e.preventDefault();
-                        lastWheelTime = now;
-                        goToPrev();
-                    } else {
-                        // Premier item atteint, marquer la direction de sortie
-                        exitDirection = 'up';
-                    }
-                }
-            }
-
-            // ScrollTrigger pour détecter quand la section est visible
-            // Calculé par rapport à la section elle-même (avec offset pour le header sticky)
-            ScrollTrigger.create({
-                trigger: section,
-                start: 'top top+=230',
-                end: 'bottom 60%',
-                onEnter: () => {
-                    isInSection = true;
-                    exitDirection = null;
-                },
-                onEnterBack: () => {
-                    isInSection = true;
-                    exitDirection = null;
-                },
-                onLeave: () => {
-                    isInSection = false;
-                    exitDirection = null;
-                },
-                onLeaveBack: () => {
-                    isInSection = false;
-                    exitDirection = null;
-                },
-                markers: false,
-                id: 'solution-section-trigger'
-            });
-
-            // Écouter les événements wheel
-            window.addEventListener('wheel', handleWheel, { passive: false });
-
-            // Refresh après chargement complet
-            window.addEventListener('load', () => {
-                ScrollTrigger.refresh();
-            });
-
-            // Gestion du resize
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    if (window.innerWidth >= 991) {
-                        ScrollTrigger.refresh();
-                    }
-                }, 250);
-            });
 
         } catch (err) {
             console.error('Erreur section-solution:', err);
