@@ -41,7 +41,6 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             height: 100%;
             opacity: 0;
             pointer-events: none;
-            overflow: hidden;
         }
 
         .section-solution .content-solution-left .w-dyn-item.solution-active {
@@ -54,20 +53,6 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            will-change: transform;
-        }
-
-        /* Overlay blanc pour l'effet de sortie */
-        .section-solution .content-solution-left .w-dyn-item .image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 1;
         }
 
         /* COLONNE DROITE - Scroll naturel */
@@ -176,19 +161,9 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             const leftItems = section.querySelectorAll('.content-solution-left .w-dyn-items .w-dyn-item');
             const rightItems = section.querySelectorAll('.content-solution-right .histoire-card .w-dyn-item');
 
-            // Ajouter l'overlay blanc à chaque image
+            // Initialiser toutes les images en position basse (comme section-avantages)
             leftItems.forEach((item) => {
-                if (!item.querySelector('.image-overlay')) {
-                    const overlay = document.createElement('div');
-                    overlay.className = 'image-overlay';
-                    item.appendChild(overlay);
-                }
-                
-                // Initialiser l'échelle de l'image
-                const img = item.querySelector('img');
-                if (img) {
-                    gsap.set(img, { scale: 1.1, y: 0 });
-                }
+                gsap.set(item, { y: '100%', opacity: 0 });
             });
 
             // Wrapper le contenu pour l'animation fluide + Numérotation dynamique
@@ -218,116 +193,156 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
 
             let currentIndex = -1;
 
-            // Fonction pour activer un item
+            // Fonction pour activer un item avec effet de stack (comme section-avantages)
             function activateItem(index) {
                 if (currentIndex === index) return;
 
                 const previousIndex = currentIndex;
                 currentIndex = index;
 
-                // Animation de sortie pour l'image précédente
-                if (previousIndex >= 0 && leftItems[previousIndex]) {
-                    const prevItem = leftItems[previousIndex];
-                    const prevImg = prevItem.querySelector('img');
-                    const prevOverlay = prevItem.querySelector('.image-overlay');
+                // Désactiver tous les items texte
+                rightItems.forEach(el => el.classList.remove('solution-active'));
 
-                    // Timeline pour l'animation de sortie
-                    const exitTl = gsap.timeline({
-                        onComplete: () => {
-                            prevItem.classList.remove('solution-active');
-                            // Reset pour la prochaine fois
-                            gsap.set(prevItem, { opacity: 0, y: 0 });
-                            gsap.set(prevImg, { scale: 1.1, y: 0 });
-                            gsap.set(prevOverlay, { opacity: 0 });
-                        }
-                    });
-
-                    exitTl
-                        // Overlay blanc qui apparaît progressivement (10% d'opacité)
-                        .to(prevOverlay, {
-                            opacity: 0.1,
-                            duration: 0.4,
-                            ease: 'power2.out'
-                        }, 0)
-                        // Image qui monte vers le haut
-                        .to(prevImg, {
-                            y: '-30%',
-                            duration: 0.5,
-                            ease: 'power2.in'
-                        }, 0)
-                        // Container qui disparaît
-                        .to(prevItem, {
-                            opacity: 0,
-                            duration: 0.4,
-                            ease: 'power2.out'
-                        }, 0.1);
+                // Activer l'item texte correspondant
+                if (rightItems[index]) {
+                    rightItems[index].classList.add('solution-active');
                 }
 
-                // Animation d'entrée pour la nouvelle image
+                // Animation des images avec effet de stack
                 if (leftItems[index]) {
-                    const newItem = leftItems[index];
-                    const newImg = newItem.querySelector('img');
-                    const newOverlay = newItem.querySelector('.image-overlay');
+                    const goingDown = index > previousIndex;
 
-                    // Préparer l'état initial
-                    gsap.set(newItem, { opacity: 0 });
-                    gsap.set(newImg, { scale: 1.1, y: 0 });
-                    gsap.set(newOverlay, { opacity: 0 });
-
-                    newItem.classList.add('solution-active');
-
-                    // Timeline pour l'animation d'entrée
-                    const enterTl = gsap.timeline();
-
-                    enterTl
-                        // Container qui apparaît
-                        .to(newItem, {
-                            opacity: 1,
-                            duration: 0.4,
-                            ease: 'power2.out'
-                        }, 0)
-                        // Image qui se réduit de 110% à 100%
-                        .to(newImg, {
-                            scale: 1,
-                            duration: 0.6,
-                            ease: 'power2.out'
-                        }, 0);
-                }
-
-                // Animation des items de droite - uniquement les classes, le CSS gère le reste
-                rightItems.forEach((item, i) => {
-                    if (i === index) {
-                        item.classList.add('solution-active');
-                    } else {
-                        item.classList.remove('solution-active');
+                    // Animation de l'ancienne image (si elle existe)
+                    if (previousIndex >= 0 && leftItems[previousIndex]) {
+                        leftItems[previousIndex].classList.remove('solution-active');
+                        gsap.to(leftItems[previousIndex], {
+                            y: goingDown ? '-100%' : '100%',
+                            opacity: 0.33,
+                            duration: 0.85,
+                            ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                        });
                     }
-                });
+
+                    // Animation de la nouvelle image
+                    leftItems[index].classList.add('solution-active');
+                    gsap.fromTo(leftItems[index],
+                        {
+                            y: goingDown ? '100%' : '-100%',
+                            opacity: 1
+                        },
+                        {
+                            y: '0%',
+                            opacity: 1,
+                            duration: 0.85,
+                            ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                        }
+                    );
+                }
             }
 
-            // Initialisation - première image visible avec scale 1
-            if (leftItems[0]) {
-                const firstImg = leftItems[0].querySelector('img');
-                gsap.set(leftItems[0], { opacity: 1 });
-                gsap.set(firstImg, { scale: 1 });
-                leftItems[0].classList.add('solution-active');
-            }
-            if (rightItems[0]) {
-                rightItems[0].classList.add('solution-active');
-            }
+            // Initialisation - première image visible en position 0
+            gsap.set(leftItems[0], { y: '0%', opacity: 1 });
+            leftItems[0].classList.add('solution-active');
+            rightItems[0].classList.add('solution-active');
             currentIndex = 0;
 
-            // ScrollTrigger pour chaque item
-            rightItems.forEach((item, i) => {
-                ScrollTrigger.create({
-                    trigger: item,
-                    start: 'top 30%',
-                    end: 'bottom center',
-                    onEnter: () => activateItem(i),
-                    onEnterBack: () => activateItem(i),
-                    markers: false,
-                    id: `solution-item-${i}`
-                });
+            const totalItems = rightItems.length;
+            let isInSection = false;
+            let lastWheelTime = 0;
+            let exitDirection = null; // 'up' ou 'down' - direction de sortie
+            const wheelCooldown = 850; // Correspond à la durée de l'animation
+
+            // Fonction pour aller à l'item suivant
+            function goToNext() {
+                if (currentIndex < totalItems - 1) {
+                    activateItem(currentIndex + 1);
+                    return true;
+                }
+                return false;
+            }
+
+            // Fonction pour aller à l'item précédent
+            function goToPrev() {
+                if (currentIndex > 0) {
+                    activateItem(currentIndex - 1);
+                    return true;
+                }
+                return false;
+            }
+
+            // Gestionnaire de wheel pour le scroll step-by-step
+            function handleWheel(e) {
+                if (!isInSection) return;
+
+                const now = Date.now();
+                const direction = e.deltaY > 0 ? 'down' : 'up';
+
+                // Si on a quitté par un bord et qu'on revient dans l'autre sens, réactiver
+                if (exitDirection !== null) {
+                    if (exitDirection !== direction) {
+                        // On revient en arrière, réactiver le contrôle
+                        exitDirection = null;
+                    } else {
+                        // On continue dans la même direction, laisser le scroll naturel
+                        return;
+                    }
+                }
+
+                // Cooldown pour éviter les transitions trop rapides
+                if (now - lastWheelTime < wheelCooldown) {
+                    e.preventDefault();
+                    return;
+                }
+
+                if (direction === 'down') {
+                    if (currentIndex < totalItems - 1) {
+                        e.preventDefault();
+                        lastWheelTime = now;
+                        goToNext();
+                    } else {
+                        // Dernier item atteint, marquer la direction de sortie
+                        exitDirection = 'down';
+                    }
+                } else {
+                    if (currentIndex > 0) {
+                        e.preventDefault();
+                        lastWheelTime = now;
+                        goToPrev();
+                    } else {
+                        // Premier item atteint, marquer la direction de sortie
+                        exitDirection = 'up';
+                    }
+                }
+            }
+
+            // ScrollTrigger pour détecter quand la section est visible
+            // Calculé par rapport à la section elle-même (avec offset pour le header sticky)
+            ScrollTrigger.create({
+                trigger: section,
+                start: 'top top+=230',
+                end: 'bottom 60%',
+                onEnter: () => {
+                    isInSection = true;
+                    exitDirection = null;
+                },
+                onEnterBack: () => {
+                    isInSection = true;
+                    exitDirection = null;
+                },
+                onLeave: () => {
+                    isInSection = false;
+                    exitDirection = null;
+                },
+                onLeaveBack: () => {
+                    isInSection = false;
+                    exitDirection = null;
+                },
+                markers: true,
+                id: 'solution-section-trigger'
             });
+
+            // Écouter les événements wheel
+            window.addEventListener('wheel', handleWheel, { passive: false });
 
             // Refresh après chargement complet
             window.addEventListener('load', () => {

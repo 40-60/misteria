@@ -2,12 +2,23 @@ import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
 import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigger.js";
 const style = document.createElement("style");
 style.innerHTML = `
+
+[page-attr="formation-entreprise"]  .programme-contenu-wrapper {
+    border-top: initial;
+}
+
+[page-attr="formation-entreprise"]  .programme-contenu-container {
+  border-top: 1px solid var(--_color---secondary--blue-violet--100);
+}
+
+
   .section-programme-contenu {
     position: relative;
     left: 0;
-    top: 6rem !important;
+    top: 3rem !important;
     margin: 0;
-    height: 100vh;
+    height: auto;
+    max-height: 850px;
     overflow: hidden;
   }
 
@@ -106,11 +117,13 @@ document.querySelectorAll(".section-programme-contenu").forEach(section => {
         progressContainer.appendChild(line);
     });
     const progressLines = progressContainer.querySelectorAll(".progress-line");
+    // Pin spacer - distance de scroll (en pixels)
+    const pinSpacer = 850;
     let tl = gsap.timeline({
         scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: () => "+=" + (wrappers.length * window.innerHeight),
+            end: "+=" + pinSpacer,
             scrub: false, // instantané
             pin: true,
             onUpdate: self => {
