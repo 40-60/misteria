@@ -313,7 +313,7 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
                     isInSection = false;
                     exitDirection = null;
                 },
-                markers: true,
+                markers: false,
                 id: 'solution-section-trigger'
             });
             // Écouter les événements wheel
