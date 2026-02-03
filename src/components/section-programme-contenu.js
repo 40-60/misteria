@@ -1,160 +1,169 @@
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
 import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigger.js";
 
-const style = document.createElement("style");
-style.innerHTML = `
+if (document.querySelector('.section-programme-contenu') && window.innerWidth >= 991) {
 
-[page-attr="formation-entreprise"]  .programme-contenu-wrapper {
-    border-top: initial;
-}
+  const style = document.createElement("style");
+  style.innerHTML = `
 
-[page-attr="formation-entreprise"]  .programme-contenu-container {
-  border-top: 1px solid var(--_color---secondary--blue-violet--100);
-}
+  [page-attr="formation-entreprise"]  .programme-contenu-wrapper {
+      border-top: initial;
+  }
 
-
-  .section-programme-contenu {
-    position: relative;
-    left: 0;
-    top: 3rem !important;
-    margin: 0;
-    height: auto;
-    max-height: 850px;
-    overflow: hidden;
+  [page-attr="formation-entreprise"]  .programme-contenu-container {
+    border-top: 1px solid var(--_color---secondary--blue-violet--100);
   }
 
 
-
-  .programme-contenu-container {
-    position: relative;
-    width: 100%;
-    height: 400px;
-  }
-
-  /* Progress bar à l'intérieur du container */
-  .progress-container {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 10;
-  }
-
-  .progress-line {
-      width: 40px;
-      height: 2px;
-      background: var(--_color---primary--100);
-      border-radius: 2px;
-      transition: background 0.4s cubic-bezier(0.4, 0, 0, 1);
-      margin-left: auto;
-      margin-right: 0;
-  }
-
-  .progress-line.active {
-      background: var(--_color---primary--500);
-      width: 56px;
-  }
-
-  .programme-contenu-wrapper {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    opacity: 0 !important;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
-  }
-
-  .programme-contenu-wrapper.active {
-    opacity: 1 !important;
-    z-index: 2;
-  }
-
-  @media (max-width: 991px) {
-      .section-programme-contenu {
-          top: 3rem !important;
-      }
-
-      .progress-container {
-            top: 10px;
-                gap: 5px;
-        }  
-
-      .programme-contenu-wrapper {
-          width: 85%;
-      }
-
-      .progress-line.active {
-          width: 33px;
-      }
-
-      .progress-line {
-        width: 23px;
-            height: 1.33px;
+    .section-programme-contenu {
+      position: relative;
+      left: 0;
+      top: 3rem !important;
+      margin: 0;
+      height: auto;
+      max-height: 850px;
+      overflow: hidden;
     }
 
-          
-  }
 
-`;
-document.head.appendChild(style);
 
-gsap.registerPlugin(ScrollTrigger);
+    .programme-contenu-container {
+      position: relative;
+      width: 100%;
+      height: 400px;
+    }
 
-document.querySelectorAll(".section-programme-contenu").forEach(section => {
-  const wrappers = section.querySelectorAll(".programme-contenu-wrapper");
-  const container = section.querySelector(".programme-contenu-container");
+    /* Progress bar à l'intérieur du container */
+    .progress-container {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+    }
 
-  // Créer le container des progress lines à l'intérieur du container
-  const progressContainer = document.createElement("div");
-  progressContainer.classList.add("progress-container");
-  container.appendChild(progressContainer);
+    .progress-line {
+        width: 40px;
+        height: 2px;
+        background: var(--_color---primary--100);
+        border-radius: 2px;
+        transition: background 0.4s cubic-bezier(0.4, 0, 0, 1);
+        margin-left: auto;
+        margin-right: 0;
+        height: 1px;
+    }
 
-  wrappers.forEach((w, idx) => {
-    // w.style.opacity = idx === 0 ? "1" : "0";
+    .progress-line.active {
+        background: var(--_color---primary--500);
+        width: 56px;
+    }
 
-    // Créer chaque ligne de progression
-    const line = document.createElement("div");
-    line.classList.add("progress-line");
-    if (idx === 0) line.classList.add("active");
-    progressContainer.appendChild(line);
-  });
+    .programme-contenu-wrapper {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0 !important;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
+    }
 
-  const progressLines = progressContainer.querySelectorAll(".progress-line");
+    .programme-contenu-wrapper.active {
+      opacity: 1 !important;
+      z-index: 2;
+    }
 
-  // Pin spacer - distance de scroll (en pixels)
-  const pinSpacer = 850;
+    @media (max-width: 991px) {
+        .section-programme-contenu {
+            top: 3rem !important;
+            margin-bottom: 5rem;
+        }
 
-  let tl = gsap.timeline({
-    scrollTrigger: {
-  trigger: section,
-  start: "top top",
-  end: "+=" + pinSpacer,
-  scrub: false, // instantané
-  pin: true,
-  onUpdate: self => {
-    // progress est toujours entre 0 et 1, même en remontant
-    let index = Math.floor(self.progress * wrappers.length);
+        .progress-container {
+              top: 9px;
+              gap: 5px;
+              right: -45px;
+          }  
 
-    // Clamp pour éviter les dépassements
-    index = Math.max(0, Math.min(wrappers.length - 1, index));
+        .programme-contenu-wrapper {
+            width: 100%;
+        }
 
-    wrappers.forEach((w, i) => {
-      w.classList.toggle("active", i === index);
-      progressLines[i].classList.toggle("active", i === index);
+      
+        .progress-line.active {
+            width: 33px;
+        }
+
+        .progress-line {
+            width: 23px;
+        }
+
+        .programme-contenu-container {
+            height: 500px;
+            width: 88%;
+
+        }
+
+            
+    }
+
+  `;
+  document.head.appendChild(style);
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll(".section-programme-contenu").forEach(section => {
+    const wrappers = section.querySelectorAll(".programme-contenu-wrapper");
+    const container = section.querySelector(".programme-contenu-container");
+    
+    // Créer le container des progress lines à l'intérieur du container
+    const progressContainer = document.createElement("div");
+    progressContainer.classList.add("progress-container");
+    container.appendChild(progressContainer);
+    
+    wrappers.forEach((w, idx) => {
+      // w.style.opacity = idx === 0 ? "1" : "0";
+      
+      // Créer chaque ligne de progression
+      const line = document.createElement("div");
+      line.classList.add("progress-line");
+      if (idx === 0) line.classList.add("active");
+      progressContainer.appendChild(line);
     });
-  }
-}
-
-
-
-  });
-
-  wrappers.forEach((wrapper, i) => {
-    if (i === 0) return;
-    tl.to(wrappers[i - 1], { 
+    
+    const progressLines = progressContainer.querySelectorAll(".progress-line");
+    
+    // Pin spacer - distance de scroll dynamique (pixels par section)
+    const scrollPerSection = 300;
+    const pinSpacer = wrappers.length * scrollPerSection;
+    
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: "top top",
+        end: "+=" + pinSpacer,
+        scrub: false, // instantané
+        pin: true,
+        onUpdate: self => {
+          // progress est toujours entre 0 et 1, même en remontant
+          let index = Math.floor(self.progress * wrappers.length);
+          
+          // Clamp pour éviter les dépassements
+          index = Math.max(0, Math.min(wrappers.length - 1, index));
+          
+          wrappers.forEach((w, i) => {
+            w.classList.toggle("active", i === index);
+            progressLines[i].classList.toggle("active", i === index);
+          });
+        }
+      }
+    });
+    
+    wrappers.forEach((wrapper, i) => {
+      if (i === 0) return;
+      tl.to(wrappers[i - 1], { 
         // opacity: 0, 
         duration: 0, 
         ease: "cubic-bezier(0.4, 0, 0, 1)" 
@@ -164,7 +173,9 @@ document.querySelectorAll(".section-programme-contenu").forEach(section => {
         duration: 0, 
         ease: "cubic-bezier(0.4, 0, 0, 1)" 
       }, i);
+    });
+    
+    
   });
 
-
-});
+}

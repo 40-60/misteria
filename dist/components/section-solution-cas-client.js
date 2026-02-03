@@ -1,5 +1,5 @@
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
-if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
+if (document.querySelector('.section-solution')) {
     const style = document.createElement("style");
     style.id = "solution-styles";
     style.innerHTML = `
@@ -14,6 +14,13 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             gap: 6rem;
             position: relative;
             align-items: start;
+        }
+
+        @media (max-width: 991px) {
+            .section-solution .methodologies-audit-wrapper {
+                grid-template-columns: 1fr;
+            }
+
         }
 
         /* COLONNE GAUCHE - Sticky */
@@ -48,8 +55,10 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
 
         .section-solution .content-solution-left .w-dyn-item img {
             width: 100%;
-            height: 100%;
             object-fit: cover;
+            min-height: 600px;
+            max-height: 100%;
+            height: 600px;
         }
 
         /* COLONNE DROITE */
@@ -70,7 +79,7 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
 
         .section-solution .content-solution-right .histoire-card .w-dyn-item {
             opacity: 0.4;
-            padding: 1.5rem 0;
+            padding: 0.75rem 0;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
