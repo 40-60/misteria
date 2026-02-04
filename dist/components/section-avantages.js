@@ -16,11 +16,14 @@ if (document.querySelector('.section-avantage')
             grid-template-columns: 1fr 1fr;
             gap: 4rem;
             position: relative;
+            align-items: start;
         }
 
         .section-avantage .avantages-anim-wrapper > div:first-child {
-            position: relative;
+            position: sticky;
+            top: 110px;
             height: fit-content;
+            align-self: start;
         }
 
         .section-avantage .title-info-avantage {
@@ -72,127 +75,101 @@ if (document.querySelector('.section-avantage')
     (async function () {
         try {
             gsap.registerPlugin(ScrollTrigger);
-            const section = document.querySelector('.section-avantage');
-            const animWrapper = section.querySelector('.avantages-anim-wrapper');
-            const leftCol = section.querySelector('.avantages-anim-wrapper > div:first-child');
-            const items = section.querySelectorAll('.avantages-wrapper .avantage-wrapper');
-            const images = section.querySelectorAll('.images-avantages-wrapper .image-avantage-item');
-            const avantagesWrapper = section.querySelector('.avantages-wrapper');
-            const steps = items.length;
-            if (!items.length || !animWrapper || !leftCol)
-                return;
-            // Variable pour tracker l'index actif
-            let currentIndex = -1;
-            // Fonction pour calculer la hauteur nécessaire
-            const setupLayout = () => {
-                animWrapper.style.minHeight = '';
-                const leftColHeight = leftCol.offsetHeight;
-                const rightColHeight = avantagesWrapper.offsetHeight;
-                const minHeight = Math.max(leftColHeight, rightColHeight);
-                animWrapper.style.minHeight = `${minHeight}px`;
-            };
-            // Setup initial
-            setupLayout();
-            // Initialiser toutes les images en position basse
-            images.forEach(img => {
-                gsap.set(img, { y: '100%', opacity: 0 });
-            });
-            // Fonction pour activer un item et son image correspondante
-            function activateItem(index) {
-                if (currentIndex === index)
+            // Gérer toutes les sections avantage
+            const sections = document.querySelectorAll('.section-avantage');
+            sections.forEach((section, sectionIndex) => {
+                const animWrapper = section.querySelector('.avantages-anim-wrapper');
+                const leftCol = section.querySelector('.avantages-anim-wrapper > div:first-child');
+                const items = section.querySelectorAll('.avantages-wrapper .avantage-wrapper');
+                const images = section.querySelectorAll('.images-avantages-wrapper .image-avantage-item');
+                const avantagesWrapper = section.querySelector('.avantages-wrapper');
+                const steps = items.length;
+                if (!items.length || !animWrapper || !leftCol)
                     return;
-                const previousIndex = currentIndex;
-                currentIndex = index;
-                // Désactiver tous les items texte (classe spécifique)
-                items.forEach(el => el.classList.remove('avantage-active'));
-                // Activer l'item texte correspondant
-                if (items[index]) {
-                    items[index].classList.add('avantage-active');
-                }
-                // Animation des images avec effet de stack
-                if (images[index]) {
-                    const goingDown = index > previousIndex;
-                    // Animation de l'ancienne image (si elle existe)
-                    if (previousIndex >= 0 && images[previousIndex]) {
-                        images[previousIndex].classList.remove('avantage-active');
-                        gsap.to(images[previousIndex], {
-                            y: goingDown ? '-100%' : '100%',
-                            opacity: 0.33,
+                // Variable pour tracker l'index actif (par section)
+                let currentIndex = -1;
+                // Initialiser toutes les images en position basse
+                images.forEach(img => {
+                    gsap.set(img, { y: '100%', opacity: 0 });
+                });
+                // Fonction pour activer un item et son image correspondante
+                function activateItem(index) {
+                    if (currentIndex === index)
+                        return;
+                    const previousIndex = currentIndex;
+                    currentIndex = index;
+                    // Désactiver tous les items texte (classe spécifique)
+                    items.forEach(el => el.classList.remove('avantage-active'));
+                    // Activer l'item texte correspondant
+                    if (items[index]) {
+                        items[index].classList.add('avantage-active');
+                    }
+                    // Animation des images avec effet de stack
+                    if (images[index]) {
+                        const goingDown = index > previousIndex;
+                        // Animation de l'ancienne image (si elle existe)
+                        if (previousIndex >= 0 && images[previousIndex]) {
+                            images[previousIndex].classList.remove('avantage-active');
+                            gsap.to(images[previousIndex], {
+                                y: goingDown ? '-100%' : '100%',
+                                opacity: 0.33,
+                                duration: 0.85,
+                                ease: 'cubic-bezier(0.4, 0, 0, 1)'
+                            });
+                        }
+                        // Animation de la nouvelle image
+                        images[index].classList.add('avantage-active');
+                        gsap.fromTo(images[index], {
+                            y: goingDown ? '100%' : '-100%',
+                            opacity: 1
+                        }, {
+                            y: '0%',
+                            opacity: 1,
                             duration: 0.85,
                             ease: 'cubic-bezier(0.4, 0, 0, 1)'
                         });
                     }
-                    // Animation de la nouvelle image
-                    images[index].classList.add('avantage-active');
-                    gsap.fromTo(images[index], {
-                        y: goingDown ? '100%' : '-100%',
-                        opacity: 1
-                    }, {
-                        y: '0%',
-                        opacity: 1,
-                        duration: 0.85,
-                        ease: 'cubic-bezier(0.4, 0, 0, 1)'
-                    });
                 }
-            }
-            // Activer le premier élément par défaut
-            gsap.set(images[0], { y: '0%', opacity: 1 });
-            images[0].classList.add('avantage-active');
-            items[0].classList.add('avantage-active');
-            currentIndex = 0;
-            // PINNING de la colonne gauche
-            ScrollTrigger.create({
-                trigger: animWrapper,
-                start: 'top top+=110px',
-                end: () => {
-                    const rightColBottom = avantagesWrapper.offsetHeight;
-                    const leftColHeight = leftCol.offsetHeight;
-                    const extraScroll = rightColBottom - leftColHeight + 110;
-                    return `+=${Math.max(extraScroll, 0)}`;
-                },
-                pin: leftCol,
-                pinSpacing: false,
-                anticipatePin: 1,
-                markers: false,
-                invalidateOnRefresh: true,
-                id: 'avantage-pin' // ID unique pour ce trigger
-            });
-            // Animation synchronisée images/contenus avec scrub
-            ScrollTrigger.create({
-                trigger: avantagesWrapper,
-                start: 'top 30%',
-                end: 'bottom center',
-                scrub: 1,
-                onUpdate: (self) => {
-                    const progress = self.progress;
-                    const segment = 1 / steps;
-                    let activeIdx = Math.floor(progress / segment);
-                    // Clamp l'index
-                    if (activeIdx < 0)
-                        activeIdx = 0;
-                    if (activeIdx >= steps)
-                        activeIdx = steps - 1;
-                    activateItem(activeIdx);
-                },
-                markers: false,
-                id: 'avantage-scroll'
-            });
-            // Gestion du resize
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    if (window.innerWidth >= 991) {
-                        setupLayout();
-                        ScrollTrigger.refresh();
-                    }
-                }, 250);
-            });
-            // Refresh après chargement complet
-            window.addEventListener('load', () => {
-                setupLayout();
-                ScrollTrigger.refresh();
-                activateItem(0);
+                // Activer le premier élément par défaut
+                gsap.set(images[0], { y: '0%', opacity: 1 });
+                images[0].classList.add('avantage-active');
+                items[0].classList.add('avantage-active');
+                currentIndex = 0;
+                // Animation synchronisée images/contenus avec scrub
+                ScrollTrigger.create({
+                    trigger: avantagesWrapper,
+                    start: 'top 20%',
+                    end: 'bottom center',
+                    scrub: 1,
+                    onUpdate: (self) => {
+                        const progress = self.progress;
+                        const segment = 1 / steps;
+                        let activeIdx = Math.floor(progress / segment);
+                        // Clamp l'index
+                        if (activeIdx < 0)
+                            activeIdx = 0;
+                        if (activeIdx >= steps)
+                            activeIdx = steps - 1;
+                        activateItem(activeIdx);
+                    },
+                    markers: false,
+                    id: `avantage-scroll-${sectionIndex}`
+                });
+                // Gestion du resize
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        if (window.innerWidth >= 991) {
+                            ScrollTrigger.refresh();
+                        }
+                    }, 250);
+                });
+                // Refresh après chargement complet
+                window.addEventListener('load', () => {
+                    ScrollTrigger.refresh();
+                    activateItem(0);
+                });
             });
         }
         catch (err) {
