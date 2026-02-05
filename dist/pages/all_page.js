@@ -1,3 +1,4 @@
+import '../components/gsap-anim-global.js';
 import '../components/section-avantages.js';
 import '../components/section-expertise-conseil.js';
 import '../components/section-programme-contenu.js';
@@ -6,4 +7,3 @@ import '../components/section-histoire.js';
 import '../components/section-testimonial.js';
 import '../components/section-team-slide.js';
 import '../components/section-solution-cas-client.js';
-import '../components/gsap-anim-global.js';
