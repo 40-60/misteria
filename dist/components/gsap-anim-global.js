@@ -18,7 +18,7 @@ splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
     document.fonts.ready.then(() => {
         // Sélectionner tous les h1 à h6 qui ne sont pas descendants de .w-dyn-items
         const headers = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
-            .filter(el => !el.closest(".w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
+            .filter(el => !el.closest(".section-mission-2 .heading-style-h2, .testimonial33_card, .gallery22_slider, .text-indent-small, .kpis-methode-wrapper , .formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
         headers.forEach((header) => {
             gsap.set(header, { opacity: 1 });
             // SplitText
@@ -45,8 +45,8 @@ splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
     });
     // paragraphe animation
     document.fonts.ready.then(() => {
-        const elements = Array.from(document.querySelectorAll(".normal-reg, .medium-reg, .medium-b"))
-            .filter(el => !el.closest(".formation-info-wrapper-global .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
+        const elements = Array.from(document.querySelectorAll(".testimonial33_card, .normal-reg, .medium-reg, .medium-b "))
+            .filter(el => !el.closest(".section-mission-2 .heading-style-h2,.formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper, .temoignage-info-1"));
         elements.forEach(el => {
             gsap.set(el, { opacity: 0, y: 30 }); // position de départ
             gsap.to(el, {
@@ -66,7 +66,7 @@ splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
     // image animation
     document.fonts.ready.then(() => {
         const images = Array.from(document.querySelectorAll("img"))
-            .filter(img => !img.closest(".section-espace-presse, .formation-info-1, .financement-wrapper, .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .footer, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container, .section-expertise-conseil"));
+            .filter(img => !img.closest(".methodologie-item-image, .testimonial33_card, .section-white-hero, .section-usages, .section-finacement-formation, .section-espace-presse, .formation-info-1, .financement-wrapper .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .ressouce-ite, .footer, .formation-info-wrapper-global, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .section-expertise-conseil, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container"));
         images.forEach(img => {
             // Wrapper
             const wrapper = document.createElement("div");
@@ -111,39 +111,60 @@ splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
             }, 0);
         });
     });
-    // animation de bloc pas au point
-    document.fonts.ready.then(() => {
-        const containers = document.querySelectorAll(".w-dyn-items");
-        containers.forEach(container => {
-            const items = container.querySelectorAll(".w-dyn-item");
-            if (!items.length)
-                return;
-            // État initial : tous à 0.2
-            gsap.set(items, { opacity: 0.2 });
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: container,
-                    start: "top 75%",
-                    end: () => "+=" + container.offsetHeight,
-                    scrub: 3, // 👈 LE POINT CLÉ
-                    invalidateOnRefresh: true,
-                    once: true // 👈 joue l’animation une seule fois
-                }
+};
+// animation de bloc pas au point
+document.fonts.ready.then(() => {
+    const containers = document.querySelectorAll(".w-dyn-items");
+    containers.forEach(container => {
+        const items = container.querySelectorAll(".w-dyn-item");
+        if (!items.length)
+            return;
+        // État initial : tous à 0.2
+        gsap.set(items, { opacity: 0.4 });
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: container,
+                start: "top 75%",
+                end: () => "+=" + container.offsetHeight,
+                scrub: 3, // 👈 LE POINT CLÉ
+                invalidateOnRefresh: true,
+                once: true // 👈 joue l’animation une seule fois
+            }
+        });
+        items.forEach((item, index) => {
+            // Étape principale : item courant à 1
+            tl.to(item, {
+                opacity: 1,
+                ease: "none"
             });
-            items.forEach((item, index) => {
-                // Étape principale : item courant à 1
-                tl.to(item, {
-                    opacity: 1,
+            // Étape suivante : préparer le prochain à 0.5
+            if (items[index + 1]) {
+                tl.to(items[index + 1], {
+                    opacity: 0.85,
                     ease: "none"
-                });
-                // Étape suivante : préparer le prochain à 0.5
-                if (items[index + 1]) {
-                    tl.to(items[index + 1], {
-                        opacity: 0.85,
-                        ease: "none"
-                    }, "<");
-                }
-            });
+                }, "<");
+            }
         });
     });
-};
+});
+// TEXT REVEAL ANIMATION - all targeted elements
+document.fonts.ready.then(() => {
+    const elements = document.querySelectorAll('.w-richtext p, .temoignage-info-1 p, .section-mission-2 .heading-style-h2');
+    elements.forEach(el => {
+        const text = el.textContent;
+        const words = text.split(/\s+/);
+        el.innerHTML = words.map(word => `<span class="reveal-word" style="color: #6D798C; display: inline-block; transition: none;">${word}</span>`).join(' ');
+        const wordSpans = el.querySelectorAll('.reveal-word');
+        gsap.to(wordSpans, {
+            color: '#251F38',
+            stagger: 0.03,
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 75%',
+                end: 'bottom 30%',
+                scrub: 1,
+            }
+        });
+    });
+    // console.log('✅ Text reveal initialisé sur', elements.length, 'éléments');
+});
