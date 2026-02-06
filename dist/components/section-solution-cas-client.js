@@ -1,5 +1,5 @@
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
-if (document.querySelector('.section-solution')) {
+if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
     const style = document.createElement("style");
     style.id = "solution-styles";
     style.innerHTML = `
@@ -99,10 +99,24 @@ if (document.querySelector('.section-solution')) {
 
         .section-solution .content-solution-right .histoire-card .w-dyn-item .margin-bottom.margin-8 {
             margin-bottom: 0 !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .section-solution .content-solution-right .histoire-card .w-dyn-item .margin-bottom.margin-24 {
             display: none;
+        }
+
+        /* Chevron icon */
+        .section-solution .accordion-chevron {
+            flex-shrink: 0;
+            margin-left: 1rem;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-solution .w-dyn-item.solution-active .accordion-chevron {
+            transform: rotate(180deg);
         }
 
         /* Accordion avec grid pour animation fluide */
@@ -172,12 +186,22 @@ if (document.querySelector('.section-solution')) {
             leftItems.forEach((item) => {
                 gsap.set(item, { y: '100%', opacity: 0 });
             });
-            // Wrapper le contenu pour l'animation fluide + Numérotation dynamique
+            // Wrapper le contenu pour l'animation fluide + Numérotation dynamique + Chevron
             rightItems.forEach((item, i) => {
                 // Numérotation
                 const numberEl = item.querySelector('.other-overline.text-color-blue-primary-500');
                 if (numberEl) {
                     numberEl.textContent = String(i + 1).padStart(2, '0');
+                }
+                // Ajouter le chevron SVG au header
+                const headerDiv = item.querySelector('.margin-bottom.margin-8');
+                if (headerDiv && !headerDiv.querySelector('.accordion-chevron')) {
+                    const chevron = document.createElement('span');
+                    chevron.className = 'accordion-chevron';
+                    chevron.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 9L12 16L5 9" stroke="#363B44" stroke-width="1.5" stroke-linecap="square"/>
+                    </svg>`;
+                    headerDiv.appendChild(chevron);
                 }
                 // Wrapper le contenu de .methodologie-item._2
                 const methodologieItem = item.querySelector('.methodologie-item._2');

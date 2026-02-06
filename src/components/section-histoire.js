@@ -1,7 +1,7 @@
-import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
-import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigger.js";
-
-if (document.querySelector('.section-histoire') && window.innerWidth >= 991) {
+// Utilise le gsap global chargé par gsap-anim-global.js
+const initSectionHistoire = () => {
+    if (!document.querySelector('.section-histoire') || window.innerWidth < 991) return;
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
     const style = document.createElement("style");
     style.innerHTML = `
@@ -15,8 +15,6 @@ if (document.querySelector('.section-histoire') && window.innerWidth >= 991) {
         .histoire-card, .methodologie-item._2 { will-change: opacity, transform; }
     `;
     document.head.appendChild(style);
-
-    gsap.registerPlugin(ScrollTrigger);
 
     const section = document.querySelector('.section-histoire');
     const cards = gsap.utils.toArray(".histoire-card");
@@ -85,6 +83,7 @@ if (document.querySelector('.section-histoire') && window.innerWidth >= 991) {
         start: "top 20%",
         end: "bottom center",
         scrub: 1,
+        invalidateOnRefresh: true,
         onUpdate: (self) => {
             const progress = self.progress;
             const segment = 1 / steps;
@@ -99,5 +98,12 @@ if (document.querySelector('.section-histoire') && window.innerWidth >= 991) {
         markers: false,
         id: 'histoire-scroll'
     });
+};
 
+// Attendre que gsap global soit disponible
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    initSectionHistoire();
+} else {
+    // Écouter l'événement gsapReady déclenché par gsap-anim-global.js
+    window.addEventListener('gsapReady', initSectionHistoire, { once: true });
 }

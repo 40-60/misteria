@@ -1,18 +1,31 @@
 // Charger GSAP depuis un CDN
+let loadedCount = 0;
+const totalScripts = 3;
+const onScriptLoad = () => {
+    loadedCount++;
+    if (loadedCount < totalScripts)
+        return;
+    gsap.registerPlugin(SplitText, ScrollTrigger);
+    // Dispatch custom event pour signaler que GSAP est prêt
+    window.dispatchEvent(new CustomEvent('gsapReady'));
+    runAnimations();
+};
 const gsapScript = document.createElement("script");
 gsapScript.src = "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js";
+gsapScript.onload = onScriptLoad;
 document.head.appendChild(gsapScript);
 // Charger SplitText depuis le CDN (version démo)
 const splitScript = document.createElement("script");
 splitScript.src = "https://assets.codepen.io/16327/SplitText3-beta.min.js?b=26";
+splitScript.onload = onScriptLoad;
 document.head.appendChild(splitScript);
 // Charger ScrollTrigger
 const scrollTriggerScript = document.createElement("script");
 scrollTriggerScript.src = "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js";
+scrollTriggerScript.onload = onScriptLoad;
 document.head.appendChild(scrollTriggerScript);
-// Attendre que tous les scripts soient chargés
-splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
-    gsap.registerPlugin(SplitText, ScrollTrigger);
+// Animations à exécuter quand tout est chargé
+function runAnimations() {
     console.clear();
     // title animation
     document.fonts.ready.then(() => {
@@ -111,7 +124,8 @@ splitScript.onload = gsapScript.onload = scrollTriggerScript.onload = () => {
             }, 0);
         });
     });
-};
+}
+;
 // animation de bloc pas au point
 document.fonts.ready.then(() => {
     const containers = document.querySelectorAll(".w-dyn-items");
