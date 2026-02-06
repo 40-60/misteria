@@ -1,4 +1,7 @@
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/index.js";
+import ScrollTrigger from "https://cdn.jsdelivr.net/npm/gsap@3.14.0/ScrollTrigger.js";
+
+gsap.registerPlugin(ScrollTrigger);
 
 if (document.querySelector('.section-direction') && window.innerWidth >= 991) {
     const style = document.createElement("style");
@@ -38,8 +41,7 @@ if (document.querySelector('.section-direction') && window.innerWidth >= 991) {
     }
 
     // Configuration
-    const slideDuration = 5;
-    const animationDuration = 0.85;
+    const animationDuration = 0.65;
     const customEase = "cubic-bezier(0.4, 0, 0, 1)";
 
     // Sélection des slides (scope à la section)
@@ -221,34 +223,59 @@ if (document.querySelector('.section-direction') && window.innerWidth >= 991) {
         return tl;
     }
 
-    function changeSlide() {
+    function goToSlide(targetIndex) {
+        if (targetIndex === currentSlide || targetIndex < 0 || targetIndex >= slides.length) return;
+
         const current = slides[currentSlide];
-        const next = slides[(currentSlide + 1) % slides.length];
+        const target = slides[targetIndex];
 
         const currentCard1 = current.querySelector('.direction-card._1');
         const currentCard2 = current.querySelectorAll('.direction-card')[1];
-        const nextCard1 = next.querySelector('.direction-card._1');
-        const nextCard2 = next.querySelectorAll('.direction-card')[1];
+        const targetCard1 = target.querySelector('.direction-card._1');
+        const targetCard2 = target.querySelectorAll('.direction-card')[1];
 
         const mainTl = gsap.timeline();
 
-        // Sortie
+        // Sortie du slide actuel
         if (currentCard1) mainTl.add(animateCard1Out(currentCard1), 0);
         if (currentCard2) mainTl.add(animateCard2Out(currentCard2), 0);
 
-        // Changement
+        // Changement de visibilité
         mainTl.add(() => {
             current.classList.remove('direction-active');
-            next.classList.add('direction-active');
+            target.classList.add('direction-active');
         });
 
-        // Entrée
-        if (nextCard1) mainTl.add(animateCard1In(nextCard1), `-=${animationDuration * 0.2}`);
-        if (nextCard2) mainTl.add(animateCard2In(nextCard2), `-=${animationDuration * 0.9}`);
+        // Entrée du nouveau slide
+        if (targetCard1) mainTl.add(animateCard1In(targetCard1), `-=${animationDuration * 0.2}`);
+        if (targetCard2) mainTl.add(animateCard2In(targetCard2), `-=${animationDuration * 0.9}`);
 
-        currentSlide = (currentSlide + 1) % slides.length;
+        currentSlide = targetIndex;
     }
 
     initSlider();
-    setInterval(changeSlide, slideDuration * 1000);
+
+    // ScrollTrigger principal avec pin
+    const teamSlider = section.querySelector('.team-slider');
+
+    ScrollTrigger.create({
+        trigger: teamSlider,
+        start: "top 13%",
+        end: () => `+=${slides.length * 100}%`,
+        pin: true,
+        pinSpacing: true,
+        scrub: false,
+        onUpdate: (self) => {
+            // Calculer quel slide afficher basé sur la progression du scroll
+            const progress = self.progress;
+            const targetSlide = Math.min(
+                Math.floor(progress * slides.length),
+                slides.length - 1
+            );
+
+            if (targetSlide !== currentSlide) {
+                goToSlide(targetSlide);
+            }
+        }
+    });
 }
