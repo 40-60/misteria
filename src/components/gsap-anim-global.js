@@ -1,4 +1,12 @@
-// Charger GSAP depuis un CDN
+// Masquer immédiatement les éléments animés pour éviter le flash (FOUC)
+  const preloadStyle = document.createElement("style");
+  preloadStyle.textContent = `
+    h1, h2, h3, h4, h5, h6 { opacity: 0; }
+    .testimonial33_card, .normal-reg, .medium-reg, .medium-b { opacity: 0; }
+  `;
+  document.head.appendChild(preloadStyle);
+
+  // Charger GSAP depuis un CDN
   let loadedCount = 0;
   const totalScripts = 3;
 
@@ -34,6 +42,9 @@
   // Animations à exécuter quand tout est chargé
   function runAnimations() {
     console.clear();
+
+    // Retirer le style de masquage maintenant que GSAP gère les éléments
+    preloadStyle.remove();
     
     // title animation
     document.fonts.ready.then(() => {

@@ -6,7 +6,7 @@ const initSectionHistoire = () => {
         return;
     const style = document.createElement("style");
     style.innerHTML = `
-        .histoire-card { opacity:0.4; transition:opacity 0.85s, transform 0.85s; transform:translateY(12px); }
+        .histoire-card { opacity:0.35; transition:opacity 850ms cubic-bezier(0.4, 0, 0, 1), transform 850ms cubic-bezier(0.4, 0, 0, 1); transform:translateY(12px); }
         .histoire-card.active { opacity:1; transform:translateY(0); }
         .methodologie-item._2 { display:none; opacity:0; transform:translateY(12px); transition:opacity 0.85s, transform 0.85s; }
         .active .methodologie-item._2 { display:block; opacity:1; transform:translateY(0); }
@@ -16,10 +16,11 @@ const initSectionHistoire = () => {
         .histoire-card, .methodologie-item._2 { will-change: opacity, transform; }
     `;
     document.head.appendChild(style);
-    const section = document.querySelector('.section-histoire');
     const cards = gsap.utils.toArray(".histoire-card");
     const images = gsap.utils.toArray(".image-histoire-content-item");
     const steps = cards.length;
+    if (!cards.length)
+        return;
     // Variable pour tracker l'index actif
     let currentIndex = -1;
     // Initialiser toutes les images en position basse
@@ -65,26 +66,51 @@ const initSectionHistoire = () => {
     images[0].classList.add("active");
     cards[0].classList.add("active");
     currentIndex = 0;
-    // ScrollTrigger avec scrub pour animation fluide
+    // --- Navigation par étapes (wheel + clavier) ---
+    const section = document.querySelector('.section-histoire');
+    let isLocked = false; // scroll verrouillé dans la section
+    let isAnimating = false; // empêche les inputs pendant l'animation
+    function goToStep(direction) {
+        if (isAnimating)
+            return;
+        const nextIndex = currentIndex + direction;
+        // Si on dépasse les limites, on libère le scroll
+        if (nextIndex < 0 || nextIndex >= steps) {
+            isLocked = false;
+            return;
+        }
+        isAnimating = true;
+        activateStep(nextIndex);
+        // Débloquer après la durée de l'animation
+        setTimeout(() => { isAnimating = false; }, 900);
+    }
+    // Wheel : un tick = un changement de carte
+    section.addEventListener('wheel', (e) => {
+        if (!isLocked)
+            return;
+        e.preventDefault();
+        const direction = e.deltaY > 0 ? 1 : -1;
+        goToStep(direction);
+    }, { passive: false });
+    // Clavier : flèches haut/bas
+    // window.addEventListener('keydown', (e) => {
+    //     if (!isLocked) return;
+    //     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    //     e.preventDefault();
+    //     const direction = e.key === 'ArrowDown' ? 1 : -1;
+    //     goToStep(direction);
+    // });
+    // ScrollTrigger pour détecter l'entrée/sortie de la section
     ScrollTrigger.create({
         trigger: section,
-        start: "top 20%",
+        start: "top 40%",
         end: "bottom center",
-        scrub: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-            const progress = self.progress;
-            const segment = 1 / steps;
-            let activeIdx = Math.floor(progress / segment);
-            // Clamp l'index
-            if (activeIdx < 0)
-                activeIdx = 0;
-            if (activeIdx >= steps)
-                activeIdx = steps - 1;
-            activateStep(activeIdx);
-        },
+        onEnter: () => { isLocked = true; },
+        onEnterBack: () => { isLocked = true; },
+        onLeave: () => { isLocked = true; },
+        onLeaveBack: () => { isLocked = true; },
         markers: false,
-        id: 'histoire-scroll'
+        id: 'histoire-lock'
     });
 };
 // Attendre que gsap global soit disponible
