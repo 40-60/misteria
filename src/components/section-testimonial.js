@@ -23,7 +23,7 @@ function setupInfiniteScroll() {
   // Animation gauche (monte)
   gsap.to(leftList, {
     yPercent: -25,
-    duration: 50,
+    duration: 250,
     ease: "none",
     repeat: -1,
     modifiers: {
@@ -34,7 +34,7 @@ function setupInfiniteScroll() {
   // Animation droite (descend - inverse)
   gsap.to(rightList, {
     yPercent: 25,
-    duration: 50,
+    duration: 250,
     ease: "none",
     repeat: -1,
     modifiers: {
@@ -49,3 +49,21 @@ if (document.readyState === 'loading') {
 } else {
   setupInfiniteScroll();
 }
+
+
+const style = document.createElement("style");
+    style.id = "avis-styles";
+    style.innerHTML = `
+            
+.testimonial33_content p {
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+    `;
+
+    if (!document.getElementById('avis-styles')) {
+        document.head.appendChild(style);
+    }
