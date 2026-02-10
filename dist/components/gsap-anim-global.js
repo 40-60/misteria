@@ -148,7 +148,7 @@ document.fonts.ready.then(() => {
         if (!items.length)
             return;
         // État initial : tous à 0.2
-        gsap.set(items, { opacity: 0.4 });
+        gsap.set(items, { opacity: 0.80 });
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: container,
@@ -163,13 +163,13 @@ document.fonts.ready.then(() => {
             // Étape principale : item courant à 1
             tl.to(item, {
                 opacity: 1,
-                ease: "none"
+                ease: "cubic-bezier(0.4, 0, 0, 1)"
             });
             // Étape suivante : préparer le prochain à 0.5
             if (items[index + 1]) {
                 tl.to(items[index + 1], {
                     opacity: 0.85,
-                    ease: "none"
+                    ease: "cubic-bezier(0.4, 0, 0, 1)"
                 }, "<");
             }
         });
