@@ -123,7 +123,7 @@ const initSectionHistoire = () => {
     // ScrollTrigger pour détecter l'entrée/sortie de la section
     ScrollTrigger.create({
         trigger: section,
-        start: "top 40%",
+        start: "top 30%",
         end: "bottom center",
         onEnter: () => { isLocked = true; },
         onEnterBack: () => { isLocked = true; },

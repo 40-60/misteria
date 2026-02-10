@@ -1,10 +1,13 @@
-// Masquer immédiatement les éléments animés pour éviter le flash (FOUC)
-const preloadStyle = document.createElement("style");
-preloadStyle.textContent = `
-    h1, h2, h3, h4, h5, h6 { opacity: 0; }
-    .testimonial33_card, .normal-reg, .medium-reg, .medium-b { opacity: 0; }
-  `;
-document.head.appendChild(preloadStyle);
+// Récupérer le style de masquage FOUC injecté dans le <head> HTML
+// IMPORTANT : ce CSS doit être dans le <head> de la page (Webflow → Project Settings → Custom Code → Head Code) :
+// <style id="gsap-preload-hide">
+//   h1, h2, h3, h4, h5, h6,
+//   .testimonial33_card, .normal-reg, .medium-reg, .medium-b {
+//     opacity: 0 !important;
+//     visibility: hidden !important;
+//   }
+// </style>
+const preloadStyle = document.getElementById("gsap-preload-hide");
 // Charger GSAP depuis un CDN
 let loadedCount = 0;
 const totalScripts = 3;
@@ -34,15 +37,15 @@ document.head.appendChild(scrollTriggerScript);
 // Animations à exécuter quand tout est chargé
 function runAnimations() {
     console.clear();
-    // Retirer le style de masquage maintenant que GSAP gère les éléments
-    preloadStyle.remove();
-    // title animation
+    // Attendre que les fonts soient prêtes avant de configurer les animations
     document.fonts.ready.then(() => {
+        // title animation
         // Sélectionner tous les h1 à h6 qui ne sont pas descendants de .w-dyn-items
         const headers = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
-            .filter(el => !el.closest(".section-mission-2 .heading-style-h2, .testimonial33_card, .gallery22_slider, .text-indent-small, .kpis-methode-wrapper , .formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
+            .filter(el => !el.closest(".section-direction, .section-mission-2 .heading-style-h2, .testimonial33_card, .gallery22_slider, .text-indent-small, .kpis-methode-wrapper , .formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
         headers.forEach((header) => {
-            gsap.set(header, { opacity: 1 });
+            // GSAP inline styles écrasent le CSS, donc on peut révéler via set()
+            gsap.set(header, { visibility: "visible", opacity: 1 });
             // SplitText
             const split = SplitText.create(header, {
                 type: "words,lines",
@@ -59,18 +62,17 @@ function runAnimations() {
                 ease: "cubic-bezier(0.4, 0, 0, 1)",
                 scrollTrigger: {
                     trigger: header,
-                    start: "top 85%", // quand le haut du header est à 80% de la fenêtre
+                    start: "top 85%",
                     toggleActions: "play none none none"
                 }
             });
         });
-    });
-    // paragraphe animation
-    document.fonts.ready.then(() => {
+        // paragraphe animation
         const elements = Array.from(document.querySelectorAll(".testimonial33_card, .normal-reg, .medium-reg, .medium-b "))
-            .filter(el => !el.closest(".section-mission-2 .heading-style-h2,.formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper, .temoignage-info-1"));
+            .filter(el => !el.closest(".section-direction, .section-mission-2 .heading-style-h2,.formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper, .temoignage-info-1"));
         elements.forEach(el => {
-            gsap.set(el, { opacity: 0, y: 30 }); // position de départ
+            // visibility visible mais opacity 0 → invisible, GSAP contrôle tout
+            gsap.set(el, { visibility: "visible", opacity: 0, y: 30 });
             gsap.to(el, {
                 opacity: 1,
                 y: 0,
@@ -79,11 +81,14 @@ function runAnimations() {
                 ease: "cubic-bezier(0.4, 0, 0, 1)",
                 scrollTrigger: {
                     trigger: el,
-                    start: "top 85%", // déclenchement quand le haut de l'élément est à 80% de la fenêtre
+                    start: "top 85%",
                     toggleActions: "play none none none"
                 }
             });
         });
+        // Retirer le style de masquage APRÈS que GSAP a posé les inline styles sur chaque élément
+        if (preloadStyle)
+            preloadStyle.remove();
     });
     // image animation
     document.fonts.ready.then(() => {
@@ -149,9 +154,9 @@ document.fonts.ready.then(() => {
                 trigger: container,
                 start: "top 75%",
                 end: () => "+=" + container.offsetHeight,
-                scrub: 3, // 👈 LE POINT CLÉ
+                scrub: 3,
                 invalidateOnRefresh: true,
-                once: true // 👈 joue l’animation une seule fois
+                once: true
             }
         });
         items.forEach((item, index) => {
@@ -189,5 +194,4 @@ document.fonts.ready.then(() => {
             }
         });
     });
-    // console.log('✅ Text reveal initialisé sur', elements.length, 'éléments');
 });
