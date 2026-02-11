@@ -66,51 +66,44 @@ const initSectionHistoire = () => {
     images[0].classList.add("active");
     cards[0].classList.add("active");
     currentIndex = 0;
-    // --- Navigation par étapes (wheel + clavier) ---
-    const section = document.querySelector('.section-histoire');
-    let isLocked = false; // scroll verrouillé dans la section
-    let isAnimating = false; // empêche les inputs pendant l'animation
-    function goToStep(direction) {
-        if (isAnimating)
-            return;
-        const nextIndex = currentIndex + direction;
-        // Si on dépasse les limites, on libère le scroll
-        if (nextIndex < 0 || nextIndex >= steps) {
-            isLocked = false;
-            return;
-        }
-        isAnimating = true;
-        activateStep(nextIndex);
-        // Débloquer après la durée de l'animation
-        setTimeout(() => { isAnimating = false; }, 900);
-    }
-    // Wheel : un tick = un changement de carte
-    section.addEventListener('wheel', (e) => {
-        if (!isLocked)
-            return;
-        e.preventDefault();
-        const direction = e.deltaY > 0 ? 1 : -1;
-        goToStep(direction);
-    }, { passive: false });
-    // Clavier : flèches haut/bas
-    // window.addEventListener('keydown', (e) => {
-    //     if (!isLocked) return;
-    //     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-    //     e.preventDefault();
-    //     const direction = e.key === 'ArrowDown' ? 1 : -1;
-    //     goToStep(direction);
-    // });
-    // ScrollTrigger pour détecter l'entrée/sortie de la section
+    // --- Navigation par scroll (comme section-avantages) ---
+    const cardsWrapper = cards[0]?.parentElement;
+    if (!cardsWrapper)
+        return;
+    // Animation synchronisée images/contenus avec scrub
     ScrollTrigger.create({
-        trigger: section,
-        start: "top 30%",
-        end: "bottom center",
-        onEnter: () => { isLocked = true; },
-        onEnterBack: () => { isLocked = true; },
-        onLeave: () => { isLocked = true; },
-        onLeaveBack: () => { isLocked = true; },
+        trigger: cardsWrapper,
+        start: 'top 30%',
+        end: 'bottom center',
+        scrub: 1,
+        onUpdate: (self) => {
+            const progress = self.progress;
+            const segment = 1 / steps;
+            let activeIdx = Math.floor(progress / segment);
+            // Clamp l'index
+            if (activeIdx < 0)
+                activeIdx = 0;
+            if (activeIdx >= steps)
+                activeIdx = steps - 1;
+            activateStep(activeIdx);
+        },
         markers: false,
-        id: 'histoire-lock'
+        id: 'histoire-scroll'
+    });
+    // Gestion du resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (window.innerWidth >= 991) {
+                ScrollTrigger.refresh();
+            }
+        }, 250);
+    });
+    // Refresh après chargement complet
+    window.addEventListener('load', () => {
+        ScrollTrigger.refresh();
+        activateStep(0);
     });
 };
 // Attendre que gsap global soit disponible
