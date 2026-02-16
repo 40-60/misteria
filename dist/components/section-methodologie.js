@@ -165,7 +165,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
             const infoTitle = document.querySelector(".methode-title-info");
             const description = document.querySelector('body > div.page-wrapper > main > section.section-methode-3 > div > div > div.margin-bottom.margin-80');
             const descriptionHeight = description ? description.offsetHeight : 0;
-            console.log('descriptionHeight', descriptionHeight);
+            // console.log('descriptionHeight', descriptionHeight);
             return `+=${rightWrapper.offsetHeight - (leftWrapper.offsetHeight)}`;
         },
         pin: true,
@@ -196,7 +196,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
     items.forEach((item, index) => {
         ScrollTrigger.create({
             trigger: item,
-            start: "top 30%",
+            start: "top 50%",
             end: "bottom center",
             onEnter: () => activateItem(index),
             onEnterBack: () => activateItem(index),

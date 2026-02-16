@@ -190,7 +190,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
 
             const descriptionHeight = description ? description.offsetHeight : 0;
 
-            console.log('descriptionHeight', descriptionHeight);
+            // console.log('descriptionHeight', descriptionHeight);
 
             return `+=${rightWrapper.offsetHeight - (leftWrapper.offsetHeight)}`;
         },
@@ -231,7 +231,7 @@ if (document.querySelector('.section-methode-3') && window.innerWidth >= 991) {
     items.forEach((item, index) => {
         ScrollTrigger.create({
             trigger: item,
-            start: "top 30%",
+            start: "top 50%",
             end: "bottom center",
             onEnter: () => activateItem(index),
             onEnterBack: () => activateItem(index),
