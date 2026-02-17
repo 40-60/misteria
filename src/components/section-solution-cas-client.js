@@ -232,9 +232,8 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
             function activateItem(index) {
                 if (isAnimating) return;
 
-                // Si on clique sur l'item déjà actif, on le ferme
+                // Si on clique sur l'item déjà actif, on ne fait rien (toujours garder un item ouvert)
                 if (currentIndex === index) {
-                    closeAll();
                     return;
                 }
 
@@ -282,34 +281,6 @@ if (document.querySelector('.section-solution') && window.innerWidth >= 991) {
                             }
                         }
                     );
-                } else {
-                    isAnimating = false;
-                }
-            }
-
-            // Fonction pour tout fermer
-            function closeAll() {
-                if (isAnimating || currentIndex === -1) return;
-
-                isAnimating = true;
-                const previousIndex = currentIndex;
-                currentIndex = -1;
-
-                // Désactiver tous les items texte
-                rightItems.forEach(el => el.classList.remove('solution-active'));
-
-                // Fermer l'image active
-                if (previousIndex >= 0 && leftItems[previousIndex]) {
-                    leftItems[previousIndex].classList.remove('solution-active');
-                    gsap.to(leftItems[previousIndex], {
-                        y: '100%',
-                        opacity: 0,
-                        duration: 0.6,
-                        ease: 'power3.inOut',
-                        onComplete: () => {
-                            isAnimating = false;
-                        }
-                    });
                 } else {
                     isAnimating = false;
                 }
