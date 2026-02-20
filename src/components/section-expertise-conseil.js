@@ -14,10 +14,10 @@ if (document.querySelector('.section-expertise-conseil') && window.innerWidth >=
 
                     /* Infos & images superposées et centrées */
                     .expertise-title-info {
-                    position: absolute;
-                    top: 50%;
-                    width: 100%;
-                    transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
+                        position: absolute;
+                        top: 6%;
+                        width: 100%;
+                        transition: opacity 0.4s cubic-bezier(0.4, 0, 0, 1);
                     }
 
                     .expertise-image-wrapper {
