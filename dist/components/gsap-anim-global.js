@@ -93,7 +93,7 @@ function runAnimations() {
     // image animation
     document.fonts.ready.then(() => {
         const images = Array.from(document.querySelectorAll("img"))
-            .filter(img => !img.closest(".methodologie-item-image, .testimonial33_card, .section-white-hero, .section-usages, .section-finacement-formation, .section-espace-presse, .formation-info-1, .financement-wrapper .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .ressouce-ite, .footer, .formation-info-wrapper-global, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .section-expertise-conseil, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container"));
+            .filter(img => !img.closest(".methodologie-item-image, .testimonial33_card, .section-white-hero, .section-usages, .section-finacement-formation, .section-espace-presse, .formation-info-1, .financement-wrapper .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .ressouce-ite, .footer, .formation-info-wrapper-global, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .section-expertise-conseil, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container, .button-group"));
         images.forEach(img => {
             // Wrapper
             const wrapper = document.createElement("div");
