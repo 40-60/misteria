@@ -42,7 +42,7 @@ function runAnimations() {
         // title animation
         // Sélectionner tous les h1 à h6 qui ne sont pas descendants de .w-dyn-items
         const headers = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
-            .filter(el => !el.closest(".section-direction, .section-mission-2 .heading-style-h2, .testimonial33_card, .gallery22_slider, .text-indent-small, .kpis-methode-wrapper , .formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
+            .filter(el => !el.closest(".disable-animation, .section-direction, .section-mission-2 .heading-style-h2, .testimonial33_card, .gallery22_slider, .text-indent-small, .kpis-methode-wrapper , .formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper"));
         headers.forEach((header) => {
             // GSAP inline styles écrasent le CSS, donc on peut révéler via set()
             gsap.set(header, { visibility: "visible", opacity: 1 });
@@ -69,7 +69,7 @@ function runAnimations() {
         });
         // paragraphe animation
         const elements = Array.from(document.querySelectorAll(".testimonial33_card, .normal-reg, .medium-reg, .medium-b "))
-            .filter(el => !el.closest(".section-direction, .section-mission-2 .heading-style-h2,.formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper, .temoignage-info-1"));
+            .filter(el => !el.closest(".disable-animation, .section-direction, .section-mission-2 .heading-style-h2,.formation-info-wrapper-global, .w-dyn-items, .formation-cta-wrapper-2, .formation-info-wrapper, .programme-contenu-wrapper, .temoignage-info-1"));
         elements.forEach(el => {
             // visibility visible mais opacity 0 → invisible, GSAP contrôle tout
             gsap.set(el, { visibility: "visible", opacity: 0, y: 30 });
@@ -93,7 +93,7 @@ function runAnimations() {
     // image animation
     document.fonts.ready.then(() => {
         const images = Array.from(document.querySelectorAll("img"))
-            .filter(img => !img.closest(".methodologie-item-image, .testimonial33_card, .section-white-hero, .section-usages, .section-finacement-formation, .section-espace-presse, .formation-info-1, .financement-wrapper .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .ressouce-ite, .footer, .formation-info-wrapper-global, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .section-expertise-conseil, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container, .button-group"));
+            .filter(img => !img.closest(".disable-animation, .methodologie-item-image, .testimonial33_card, .section-white-hero, .section-usages, .section-finacement-formation, .section-espace-presse, .formation-info-1, .financement-wrapper .section.section-finacement-formation, .radius-full, .section-methode-3, .ressouce-item, .section-entreprises-partenaires, .nav_container, .ressouce-ite, .footer, .formation-info-wrapper-global, .testimonial33_content, .intervenant-regroup, .programme-contenu-container, ._24x24, .section-expertise-conseil, .avantages-anim-wrapper, .w-dyn-items, .logo6_content, .video-presse-container, .button-group"));
         images.forEach(img => {
             // Wrapper
             const wrapper = document.createElement("div");
